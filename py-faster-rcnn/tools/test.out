@@ -1,0 +1,7691 @@
+roostDemo.py:199: RuntimeWarning: to-Python converter for boost::shared_ptr<caffe::Blob<float> > already registered; second conversion method ignored.
+  caffe.set_mode_gpu()
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0625 19:26:06.319099 14274 net.cpp:49] Initializing net from parameters: 
+name: "ZF"
+input: "data"
+input: "im_info"
+state {
+  phase: TEST
+}
+input_shape {
+  dim: 1
+  dim: 3
+  dim: 224
+  dim: 224
+}
+input_shape {
+  dim: 1
+  dim: 3
+}
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv1"
+  convolution_param {
+    num_output: 96
+    pad: 3
+    kernel_size: 7
+    stride: 2
+  }
+}
+layer {
+  name: "relu1"
+  type: "ReLU"
+  bottom: "conv1"
+  top: "conv1"
+}
+layer {
+  name: "norm1"
+  type: "LRN"
+  bottom: "conv1"
+  top: "norm1"
+  lrn_param {
+    local_size: 3
+    alpha: 5e-05
+    beta: 0.75
+    norm_region: WITHIN_CHANNEL
+    engine: CAFFE
+  }
+}
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "norm1"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+    pad: 1
+  }
+}
+layer {
+  name: "conv2"
+  type: "Convolution"
+  bottom: "pool1"
+  top: "conv2"
+  convolution_param {
+    num_output: 256
+    pad: 2
+    kernel_size: 5
+    stride: 2
+  }
+}
+layer {
+  name: "relu2"
+  type: "ReLU"
+  bottom: "conv2"
+  top: "conv2"
+}
+layer {
+  name: "norm2"
+  type: "LRN"
+  bottom: "conv2"
+  top: "norm2"
+  lrn_param {
+    local_size: 3
+    alpha: 5e-05
+    beta: 0.75
+    norm_region: WITHIN_CHANNEL
+    engine: CAFFE
+  }
+}
+layer {
+  name: "pool2"
+  type: "Pooling"
+  bottom: "norm2"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+    pad: 1
+  }
+}
+layer {
+  name: "conv3"
+  type: "Convolution"
+  bottom: "pool2"
+  top: "conv3"
+  convolution_param {
+    num_output: 384
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "relu3"
+  type: "ReLU"
+  bottom: "conv3"
+  top: "conv3"
+}
+layer {
+  name: "conv4"
+  type: "Convolution"
+  bottom: "conv3"
+  top: "conv4"
+  convolution_param {
+    num_output: 384
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "relu4"
+  type: "ReLU"
+  bottom: "conv4"
+  top: "conv4"
+}
+layer {
+  name: "conv5"
+  type: "Convolution"
+  bottom: "conv4"
+  top: "conv5"
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "relu5"
+  type: "ReLU"
+  bottom: "conv5"
+  top: "conv5"
+}
+layer {
+  name: "rpn_conv/3x3"
+  type: "Convolution"
+  bottom: "conv5"
+  top: "rpn/output"
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "rpn_relu/3x3"
+  type: "ReLU"
+  bottom: "rpn/output"
+  top: "rpn/output"
+}
+layer {
+  name: "rpn_cls_score"
+  type: "Convolution"
+  bottom: "rpn/output"
+  top: "rpn_cls_score"
+  convolution_param {
+    num_output: 18
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "rpn_bbox_pred"
+  type: "Convolution"
+  bottom: "rpn/output"
+  top: "rpn_bbox_pred"
+  convolution_param {
+    num_output: 36
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "rpn_cls_score_reshape"
+  type: "Reshape"
+  bottom: "rpn_cls_score"
+  top: "rpn_cls_score_reshape"
+  reshape_param {
+    shape {
+      dim: 0
+      dim: 2
+      dim: -1
+      dim: 0
+    }
+  }
+}
+layer {
+  name: "rpn_cls_prob"
+  type: "Softmax"
+  bottom: "rpn_cls_score_reshape"
+  top: "rpn_cls_prob"
+}
+layer {
+  name: "rpn_cls_prob_reshape"
+  type: "Reshape"
+  bottom: "rpn_cls_prob"
+  top: "rpn_cls_prob_reshape"
+  reshape_param {
+    shape {
+      dim: 0
+      dim: 18
+      dim: -1
+      dim: 0
+    }
+  }
+}
+layer {
+  name: "proposal"
+  type: "Python"
+  bottom: "rpn_cls_prob_reshape"
+  bottom: "rpn_bbox_pred"
+  bottom: "im_info"
+  top: "rois"
+  python_param {
+    module: "rpn.proposal_layer"
+    layer: "ProposalLayer"
+    param_str: "\'feat_stride\': 16"
+  }
+}
+layer {
+  name: "roi_pool_conv5"
+  type: "ROIPooling"
+  bottom: "conv5"
+  bottom: "rois"
+  top: "roi_pool_conv5"
+  roi_pooling_param {
+    pooled_h: 6
+    pooled_w: 6
+    spatial_scale: 0.0625
+  }
+}
+layer {
+  name: "fc6"
+  type: "InnerProduct"
+  bottom: "roi_pool_conv5"
+  top: "fc6"
+  inner_product_param {
+    num_output: 4096
+  }
+}
+layer {
+  name: "relu6"
+  type: "ReLU"
+  bottom: "fc6"
+  top: "fc6"
+}
+layer {
+  name: "drop6"
+  type: "Dropout"
+  bottom: "fc6"
+  top: "fc6"
+  dropout_param {
+    dropout_ratio: 0.5
+    scale_train: false
+  }
+}
+layer {
+  name: "fc7"
+  type: "InnerProduct"
+  bottom: "fc6"
+  top: "fc7"
+  inner_product_param {
+    num_output: 4096
+  }
+}
+layer {
+  name: "relu7"
+  type: "ReLU"
+  bottom: "fc7"
+  top: "fc7"
+}
+layer {
+  name: "drop7"
+  type: "Dropout"
+  bottom: "fc7"
+  top: "fc7"
+  dropout_param {
+    dropout_ratio: 0.5
+    scale_train: false
+  }
+}
+layer {
+  name: "cls_score"
+  type: "InnerProduct"
+  bottom: "fc7"
+  top: "cls_score"
+  inner_product_param {
+    num_output: 2
+  }
+}
+layer {
+  name: "bbox_pred"
+  type: "InnerProduct"
+  bottom: "fc7"
+  top: "bbox_pred"
+  inner_product_param {
+    num_output: 8
+  }
+}
+layer {
+  name: "cls_prob"
+  type: "Softmax"
+  bottom: "cls_score"
+  top: "cls_prob"
+  loss_param {
+    ignore_label: -1
+    normalize: true
+  }
+}
+I0625 19:26:06.319370 14274 net.cpp:413] Input 0 -> data
+I0625 19:26:06.352749 14274 net.cpp:413] Input 1 -> im_info
+I0625 19:26:06.352810 14274 layer_factory.hpp:77] Creating layer conv1
+I0625 19:26:06.352844 14274 net.cpp:106] Creating Layer conv1
+I0625 19:26:06.352850 14274 net.cpp:454] conv1 <- data
+I0625 19:26:06.352857 14274 net.cpp:411] conv1 -> conv1
+I0625 19:26:06.353657 14274 net.cpp:150] Setting up conv1
+I0625 19:26:06.353674 14274 net.cpp:157] Top shape: 1 96 112 112 (1204224)
+I0625 19:26:06.353677 14274 net.cpp:165] Memory required for data: 4816896
+I0625 19:26:06.353693 14274 layer_factory.hpp:77] Creating layer relu1
+I0625 19:26:06.353703 14274 net.cpp:106] Creating Layer relu1
+I0625 19:26:06.353706 14274 net.cpp:454] relu1 <- conv1
+I0625 19:26:06.353711 14274 net.cpp:397] relu1 -> conv1 (in-place)
+I0625 19:26:06.353720 14274 net.cpp:150] Setting up relu1
+I0625 19:26:06.353724 14274 net.cpp:157] Top shape: 1 96 112 112 (1204224)
+I0625 19:26:06.353726 14274 net.cpp:165] Memory required for data: 9633792
+I0625 19:26:06.353729 14274 layer_factory.hpp:77] Creating layer norm1
+I0625 19:26:06.353736 14274 net.cpp:106] Creating Layer norm1
+I0625 19:26:06.353739 14274 net.cpp:454] norm1 <- conv1
+I0625 19:26:06.353744 14274 net.cpp:411] norm1 -> norm1
+I0625 19:26:06.353842 14274 net.cpp:150] Setting up norm1
+I0625 19:26:06.353850 14274 net.cpp:157] Top shape: 1 96 112 112 (1204224)
+I0625 19:26:06.353853 14274 net.cpp:165] Memory required for data: 14450688
+I0625 19:26:06.353857 14274 layer_factory.hpp:77] Creating layer pool1
+I0625 19:26:06.353863 14274 net.cpp:106] Creating Layer pool1
+I0625 19:26:06.353865 14274 net.cpp:454] pool1 <- norm1
+I0625 19:26:06.353870 14274 net.cpp:411] pool1 -> pool1
+I0625 19:26:06.353899 14274 net.cpp:150] Setting up pool1
+I0625 19:26:06.353905 14274 net.cpp:157] Top shape: 1 96 57 57 (311904)
+I0625 19:26:06.353909 14274 net.cpp:165] Memory required for data: 15698304
+I0625 19:26:06.353911 14274 layer_factory.hpp:77] Creating layer conv2
+I0625 19:26:06.353919 14274 net.cpp:106] Creating Layer conv2
+I0625 19:26:06.353922 14274 net.cpp:454] conv2 <- pool1
+I0625 19:26:06.353927 14274 net.cpp:411] conv2 -> conv2
+I0625 19:26:06.356132 14274 net.cpp:150] Setting up conv2
+I0625 19:26:06.356147 14274 net.cpp:157] Top shape: 1 256 29 29 (215296)
+I0625 19:26:06.356149 14274 net.cpp:165] Memory required for data: 16559488
+I0625 19:26:06.356158 14274 layer_factory.hpp:77] Creating layer relu2
+I0625 19:26:06.356165 14274 net.cpp:106] Creating Layer relu2
+I0625 19:26:06.356169 14274 net.cpp:454] relu2 <- conv2
+I0625 19:26:06.356173 14274 net.cpp:397] relu2 -> conv2 (in-place)
+I0625 19:26:06.356180 14274 net.cpp:150] Setting up relu2
+I0625 19:26:06.356184 14274 net.cpp:157] Top shape: 1 256 29 29 (215296)
+I0625 19:26:06.356186 14274 net.cpp:165] Memory required for data: 17420672
+I0625 19:26:06.356189 14274 layer_factory.hpp:77] Creating layer norm2
+I0625 19:26:06.356194 14274 net.cpp:106] Creating Layer norm2
+I0625 19:26:06.356197 14274 net.cpp:454] norm2 <- conv2
+I0625 19:26:06.356202 14274 net.cpp:411] norm2 -> norm2
+I0625 19:26:06.356284 14274 net.cpp:150] Setting up norm2
+I0625 19:26:06.356292 14274 net.cpp:157] Top shape: 1 256 29 29 (215296)
+I0625 19:26:06.356295 14274 net.cpp:165] Memory required for data: 18281856
+I0625 19:26:06.356298 14274 layer_factory.hpp:77] Creating layer pool2
+I0625 19:26:06.356304 14274 net.cpp:106] Creating Layer pool2
+I0625 19:26:06.356307 14274 net.cpp:454] pool2 <- norm2
+I0625 19:26:06.356312 14274 net.cpp:411] pool2 -> pool2
+I0625 19:26:06.356338 14274 net.cpp:150] Setting up pool2
+I0625 19:26:06.356344 14274 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0625 19:26:06.356346 14274 net.cpp:165] Memory required for data: 18512256
+I0625 19:26:06.356349 14274 layer_factory.hpp:77] Creating layer conv3
+I0625 19:26:06.356358 14274 net.cpp:106] Creating Layer conv3
+I0625 19:26:06.356360 14274 net.cpp:454] conv3 <- pool2
+I0625 19:26:06.356365 14274 net.cpp:411] conv3 -> conv3
+I0625 19:26:06.358589 14274 net.cpp:150] Setting up conv3
+I0625 19:26:06.358602 14274 net.cpp:157] Top shape: 1 384 15 15 (86400)
+I0625 19:26:06.358604 14274 net.cpp:165] Memory required for data: 18857856
+I0625 19:26:06.358613 14274 layer_factory.hpp:77] Creating layer relu3
+I0625 19:26:06.358620 14274 net.cpp:106] Creating Layer relu3
+I0625 19:26:06.358623 14274 net.cpp:454] relu3 <- conv3
+I0625 19:26:06.358628 14274 net.cpp:397] relu3 -> conv3 (in-place)
+I0625 19:26:06.358634 14274 net.cpp:150] Setting up relu3
+I0625 19:26:06.358639 14274 net.cpp:157] Top shape: 1 384 15 15 (86400)
+I0625 19:26:06.358641 14274 net.cpp:165] Memory required for data: 19203456
+I0625 19:26:06.358644 14274 layer_factory.hpp:77] Creating layer conv4
+I0625 19:26:06.358650 14274 net.cpp:106] Creating Layer conv4
+I0625 19:26:06.358654 14274 net.cpp:454] conv4 <- conv3
+I0625 19:26:06.358659 14274 net.cpp:411] conv4 -> conv4
+I0625 19:26:06.361825 14274 net.cpp:150] Setting up conv4
+I0625 19:26:06.361837 14274 net.cpp:157] Top shape: 1 384 15 15 (86400)
+I0625 19:26:06.361840 14274 net.cpp:165] Memory required for data: 19549056
+I0625 19:26:06.361847 14274 layer_factory.hpp:77] Creating layer relu4
+I0625 19:26:06.361853 14274 net.cpp:106] Creating Layer relu4
+I0625 19:26:06.361857 14274 net.cpp:454] relu4 <- conv4
+I0625 19:26:06.361862 14274 net.cpp:397] relu4 -> conv4 (in-place)
+I0625 19:26:06.361870 14274 net.cpp:150] Setting up relu4
+I0625 19:26:06.361872 14274 net.cpp:157] Top shape: 1 384 15 15 (86400)
+I0625 19:26:06.361876 14274 net.cpp:165] Memory required for data: 19894656
+I0625 19:26:06.361878 14274 layer_factory.hpp:77] Creating layer conv5
+I0625 19:26:06.361886 14274 net.cpp:106] Creating Layer conv5
+I0625 19:26:06.361888 14274 net.cpp:454] conv5 <- conv4
+I0625 19:26:06.361893 14274 net.cpp:411] conv5 -> conv5
+I0625 19:26:06.364080 14274 net.cpp:150] Setting up conv5
+I0625 19:26:06.364091 14274 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0625 19:26:06.364106 14274 net.cpp:165] Memory required for data: 20125056
+I0625 19:26:06.364117 14274 layer_factory.hpp:77] Creating layer relu5
+I0625 19:26:06.364125 14274 net.cpp:106] Creating Layer relu5
+I0625 19:26:06.364128 14274 net.cpp:454] relu5 <- conv5
+I0625 19:26:06.364133 14274 net.cpp:397] relu5 -> conv5 (in-place)
+I0625 19:26:06.364140 14274 net.cpp:150] Setting up relu5
+I0625 19:26:06.364143 14274 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0625 19:26:06.364146 14274 net.cpp:165] Memory required for data: 20355456
+I0625 19:26:06.364148 14274 layer_factory.hpp:77] Creating layer conv5_relu5_0_split
+I0625 19:26:06.364161 14274 net.cpp:106] Creating Layer conv5_relu5_0_split
+I0625 19:26:06.364163 14274 net.cpp:454] conv5_relu5_0_split <- conv5
+I0625 19:26:06.364168 14274 net.cpp:411] conv5_relu5_0_split -> conv5_relu5_0_split_0
+I0625 19:26:06.364174 14274 net.cpp:411] conv5_relu5_0_split -> conv5_relu5_0_split_1
+I0625 19:26:06.364210 14274 net.cpp:150] Setting up conv5_relu5_0_split
+I0625 19:26:06.364217 14274 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0625 19:26:06.364223 14274 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0625 19:26:06.364225 14274 net.cpp:165] Memory required for data: 20816256
+I0625 19:26:06.364228 14274 layer_factory.hpp:77] Creating layer rpn_conv/3x3
+I0625 19:26:06.364238 14274 net.cpp:106] Creating Layer rpn_conv/3x3
+I0625 19:26:06.364241 14274 net.cpp:454] rpn_conv/3x3 <- conv5_relu5_0_split_0
+I0625 19:26:06.364248 14274 net.cpp:411] rpn_conv/3x3 -> rpn/output
+I0625 19:26:06.375367 14274 net.cpp:150] Setting up rpn_conv/3x3
+I0625 19:26:06.375378 14274 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0625 19:26:06.375382 14274 net.cpp:165] Memory required for data: 21046656
+I0625 19:26:06.375388 14274 layer_factory.hpp:77] Creating layer rpn_relu/3x3
+I0625 19:26:06.375397 14274 net.cpp:106] Creating Layer rpn_relu/3x3
+I0625 19:26:06.375401 14274 net.cpp:454] rpn_relu/3x3 <- rpn/output
+I0625 19:26:06.375406 14274 net.cpp:397] rpn_relu/3x3 -> rpn/output (in-place)
+I0625 19:26:06.375412 14274 net.cpp:150] Setting up rpn_relu/3x3
+I0625 19:26:06.375416 14274 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0625 19:26:06.375419 14274 net.cpp:165] Memory required for data: 21277056
+I0625 19:26:06.375422 14274 layer_factory.hpp:77] Creating layer rpn/output_rpn_relu/3x3_0_split
+I0625 19:26:06.375427 14274 net.cpp:106] Creating Layer rpn/output_rpn_relu/3x3_0_split
+I0625 19:26:06.375429 14274 net.cpp:454] rpn/output_rpn_relu/3x3_0_split <- rpn/output
+I0625 19:26:06.375434 14274 net.cpp:411] rpn/output_rpn_relu/3x3_0_split -> rpn/output_rpn_relu/3x3_0_split_0
+I0625 19:26:06.375439 14274 net.cpp:411] rpn/output_rpn_relu/3x3_0_split -> rpn/output_rpn_relu/3x3_0_split_1
+I0625 19:26:06.375469 14274 net.cpp:150] Setting up rpn/output_rpn_relu/3x3_0_split
+I0625 19:26:06.375475 14274 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0625 19:26:06.375479 14274 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0625 19:26:06.375483 14274 net.cpp:165] Memory required for data: 21737856
+I0625 19:26:06.375485 14274 layer_factory.hpp:77] Creating layer rpn_cls_score
+I0625 19:26:06.375494 14274 net.cpp:106] Creating Layer rpn_cls_score
+I0625 19:26:06.375496 14274 net.cpp:454] rpn_cls_score <- rpn/output_rpn_relu/3x3_0_split_0
+I0625 19:26:06.375502 14274 net.cpp:411] rpn_cls_score -> rpn_cls_score
+I0625 19:26:06.375764 14274 net.cpp:150] Setting up rpn_cls_score
+I0625 19:26:06.375772 14274 net.cpp:157] Top shape: 1 18 15 15 (4050)
+I0625 19:26:06.375774 14274 net.cpp:165] Memory required for data: 21754056
+I0625 19:26:06.375780 14274 layer_factory.hpp:77] Creating layer rpn_bbox_pred
+I0625 19:26:06.375789 14274 net.cpp:106] Creating Layer rpn_bbox_pred
+I0625 19:26:06.375792 14274 net.cpp:454] rpn_bbox_pred <- rpn/output_rpn_relu/3x3_0_split_1
+I0625 19:26:06.375797 14274 net.cpp:411] rpn_bbox_pred -> rpn_bbox_pred
+I0625 19:26:06.376140 14274 net.cpp:150] Setting up rpn_bbox_pred
+I0625 19:26:06.376147 14274 net.cpp:157] Top shape: 1 36 15 15 (8100)
+I0625 19:26:06.376150 14274 net.cpp:165] Memory required for data: 21786456
+I0625 19:26:06.376169 14274 layer_factory.hpp:77] Creating layer rpn_cls_score_reshape
+I0625 19:26:06.376181 14274 net.cpp:106] Creating Layer rpn_cls_score_reshape
+I0625 19:26:06.376184 14274 net.cpp:454] rpn_cls_score_reshape <- rpn_cls_score
+I0625 19:26:06.376190 14274 net.cpp:411] rpn_cls_score_reshape -> rpn_cls_score_reshape
+I0625 19:26:06.376225 14274 net.cpp:150] Setting up rpn_cls_score_reshape
+I0625 19:26:06.376231 14274 net.cpp:157] Top shape: 1 2 135 15 (4050)
+I0625 19:26:06.376235 14274 net.cpp:165] Memory required for data: 21802656
+I0625 19:26:06.376237 14274 layer_factory.hpp:77] Creating layer rpn_cls_prob
+I0625 19:26:06.376243 14274 net.cpp:106] Creating Layer rpn_cls_prob
+I0625 19:26:06.376246 14274 net.cpp:454] rpn_cls_prob <- rpn_cls_score_reshape
+I0625 19:26:06.376251 14274 net.cpp:411] rpn_cls_prob -> rpn_cls_prob
+I0625 19:26:06.376303 14274 net.cpp:150] Setting up rpn_cls_prob
+I0625 19:26:06.376309 14274 net.cpp:157] Top shape: 1 2 135 15 (4050)
+I0625 19:26:06.376312 14274 net.cpp:165] Memory required for data: 21818856
+I0625 19:26:06.376315 14274 layer_factory.hpp:77] Creating layer rpn_cls_prob_reshape
+I0625 19:26:06.376320 14274 net.cpp:106] Creating Layer rpn_cls_prob_reshape
+I0625 19:26:06.376324 14274 net.cpp:454] rpn_cls_prob_reshape <- rpn_cls_prob
+I0625 19:26:06.376329 14274 net.cpp:411] rpn_cls_prob_reshape -> rpn_cls_prob_reshape
+I0625 19:26:06.376348 14274 net.cpp:150] Setting up rpn_cls_prob_reshape
+I0625 19:26:06.376354 14274 net.cpp:157] Top shape: 1 18 15 15 (4050)
+I0625 19:26:06.376358 14274 net.cpp:165] Memory required for data: 21835056
+I0625 19:26:06.376360 14274 layer_factory.hpp:77] Creating layer proposal
+I0625 19:26:06.443593 14274 net.cpp:106] Creating Layer proposal
+I0625 19:26:06.443625 14274 net.cpp:454] proposal <- rpn_cls_prob_reshape
+I0625 19:26:06.443637 14274 net.cpp:454] proposal <- rpn_bbox_pred
+I0625 19:26:06.443645 14274 net.cpp:454] proposal <- im_info
+I0625 19:26:06.443655 14274 net.cpp:411] proposal -> rois
+I0625 19:26:06.446266 14274 net.cpp:150] Setting up proposal
+I0625 19:26:06.446331 14274 net.cpp:157] Top shape: 1 5 (5)
+I0625 19:26:06.446362 14274 net.cpp:165] Memory required for data: 21835076
+I0625 19:26:06.446391 14274 layer_factory.hpp:77] Creating layer roi_pool_conv5
+I0625 19:26:06.446430 14274 net.cpp:106] Creating Layer roi_pool_conv5
+I0625 19:26:06.446461 14274 net.cpp:454] roi_pool_conv5 <- conv5_relu5_0_split_1
+I0625 19:26:06.446491 14274 net.cpp:454] roi_pool_conv5 <- rois
+I0625 19:26:06.446522 14274 net.cpp:411] roi_pool_conv5 -> roi_pool_conv5
+I0625 19:26:06.446559 14274 roi_pooling_layer.cpp:30] Spatial scale: 0.0625
+I0625 19:26:06.446660 14274 net.cpp:150] Setting up roi_pool_conv5
+I0625 19:26:06.446694 14274 net.cpp:157] Top shape: 1 256 6 6 (9216)
+I0625 19:26:06.446725 14274 net.cpp:165] Memory required for data: 21871940
+I0625 19:26:06.446751 14274 layer_factory.hpp:77] Creating layer fc6
+I0625 19:26:06.446785 14274 net.cpp:106] Creating Layer fc6
+I0625 19:26:06.446821 14274 net.cpp:454] fc6 <- roi_pool_conv5
+I0625 19:26:06.446851 14274 net.cpp:411] fc6 -> fc6
+I0625 19:26:06.566416 14274 net.cpp:150] Setting up fc6
+I0625 19:26:06.566612 14274 net.cpp:157] Top shape: 1 4096 (4096)
+I0625 19:26:06.566689 14274 net.cpp:165] Memory required for data: 21888324
+I0625 19:26:06.566767 14274 layer_factory.hpp:77] Creating layer relu6
+I0625 19:26:06.566836 14274 net.cpp:106] Creating Layer relu6
+I0625 19:26:06.566901 14274 net.cpp:454] relu6 <- fc6
+I0625 19:26:06.566962 14274 net.cpp:397] relu6 -> fc6 (in-place)
+I0625 19:26:06.567028 14274 net.cpp:150] Setting up relu6
+I0625 19:26:06.567086 14274 net.cpp:157] Top shape: 1 4096 (4096)
+I0625 19:26:06.567147 14274 net.cpp:165] Memory required for data: 21904708
+I0625 19:26:06.567200 14274 layer_factory.hpp:77] Creating layer drop6
+I0625 19:26:06.567273 14274 net.cpp:106] Creating Layer drop6
+I0625 19:26:06.567335 14274 net.cpp:454] drop6 <- fc6
+I0625 19:26:06.567394 14274 net.cpp:397] drop6 -> fc6 (in-place)
+I0625 19:26:06.567492 14274 net.cpp:150] Setting up drop6
+I0625 19:26:06.567554 14274 net.cpp:157] Top shape: 1 4096 (4096)
+I0625 19:26:06.567610 14274 net.cpp:165] Memory required for data: 21921092
+I0625 19:26:06.567665 14274 layer_factory.hpp:77] Creating layer fc7
+I0625 19:26:06.567726 14274 net.cpp:106] Creating Layer fc7
+I0625 19:26:06.567781 14274 net.cpp:454] fc7 <- fc6
+I0625 19:26:06.567842 14274 net.cpp:411] fc7 -> fc7
+I0625 19:26:06.621199 14274 net.cpp:150] Setting up fc7
+I0625 19:26:06.621405 14274 net.cpp:157] Top shape: 1 4096 (4096)
+I0625 19:26:06.621457 14274 net.cpp:165] Memory required for data: 21937476
+I0625 19:26:06.621515 14274 layer_factory.hpp:77] Creating layer relu7
+I0625 19:26:06.621572 14274 net.cpp:106] Creating Layer relu7
+I0625 19:26:06.621620 14274 net.cpp:454] relu7 <- fc7
+I0625 19:26:06.621671 14274 net.cpp:397] relu7 -> fc7 (in-place)
+I0625 19:26:06.621727 14274 net.cpp:150] Setting up relu7
+I0625 19:26:06.621788 14274 net.cpp:157] Top shape: 1 4096 (4096)
+I0625 19:26:06.621834 14274 net.cpp:165] Memory required for data: 21953860
+I0625 19:26:06.621876 14274 layer_factory.hpp:77] Creating layer drop7
+I0625 19:26:06.621923 14274 net.cpp:106] Creating Layer drop7
+I0625 19:26:06.621968 14274 net.cpp:454] drop7 <- fc7
+I0625 19:26:06.622014 14274 net.cpp:397] drop7 -> fc7 (in-place)
+I0625 19:26:06.622092 14274 net.cpp:150] Setting up drop7
+I0625 19:26:06.622144 14274 net.cpp:157] Top shape: 1 4096 (4096)
+I0625 19:26:06.622187 14274 net.cpp:165] Memory required for data: 21970244
+I0625 19:26:06.622239 14274 layer_factory.hpp:77] Creating layer fc7_drop7_0_split
+I0625 19:26:06.622289 14274 net.cpp:106] Creating Layer fc7_drop7_0_split
+I0625 19:26:06.622333 14274 net.cpp:454] fc7_drop7_0_split <- fc7
+I0625 19:26:06.622380 14274 net.cpp:411] fc7_drop7_0_split -> fc7_drop7_0_split_0
+I0625 19:26:06.622431 14274 net.cpp:411] fc7_drop7_0_split -> fc7_drop7_0_split_1
+I0625 19:26:06.622526 14274 net.cpp:150] Setting up fc7_drop7_0_split
+I0625 19:26:06.622578 14274 net.cpp:157] Top shape: 1 4096 (4096)
+I0625 19:26:06.622624 14274 net.cpp:157] Top shape: 1 4096 (4096)
+I0625 19:26:06.622666 14274 net.cpp:165] Memory required for data: 22003012
+I0625 19:26:06.622709 14274 layer_factory.hpp:77] Creating layer cls_score
+I0625 19:26:06.622764 14274 net.cpp:106] Creating Layer cls_score
+I0625 19:26:06.622809 14274 net.cpp:454] cls_score <- fc7_drop7_0_split_0
+I0625 19:26:06.622856 14274 net.cpp:411] cls_score -> cls_score
+I0625 19:26:06.623031 14274 net.cpp:150] Setting up cls_score
+I0625 19:26:06.623086 14274 net.cpp:157] Top shape: 1 2 (2)
+I0625 19:26:06.623129 14274 net.cpp:165] Memory required for data: 22003020
+I0625 19:26:06.623178 14274 layer_factory.hpp:77] Creating layer bbox_pred
+I0625 19:26:06.623232 14274 net.cpp:106] Creating Layer bbox_pred
+I0625 19:26:06.623281 14274 net.cpp:454] bbox_pred <- fc7_drop7_0_split_1
+I0625 19:26:06.623338 14274 net.cpp:411] bbox_pred -> bbox_pred
+I0625 19:26:06.624375 14274 net.cpp:150] Setting up bbox_pred
+I0625 19:26:06.624447 14274 net.cpp:157] Top shape: 1 8 (8)
+I0625 19:26:06.624495 14274 net.cpp:165] Memory required for data: 22003052
+I0625 19:26:06.624544 14274 layer_factory.hpp:77] Creating layer cls_prob
+I0625 19:26:06.624595 14274 net.cpp:106] Creating Layer cls_prob
+I0625 19:26:06.624641 14274 net.cpp:454] cls_prob <- cls_score
+I0625 19:26:06.624688 14274 net.cpp:411] cls_prob -> cls_prob
+I0625 19:26:06.624807 14274 net.cpp:150] Setting up cls_prob
+I0625 19:26:06.624861 14274 net.cpp:157] Top shape: 1 2 (2)
+I0625 19:26:06.624905 14274 net.cpp:165] Memory required for data: 22003060
+I0625 19:26:06.624948 14274 net.cpp:228] cls_prob does not need backward computation.
+I0625 19:26:06.624991 14274 net.cpp:228] bbox_pred does not need backward computation.
+I0625 19:26:06.625033 14274 net.cpp:228] cls_score does not need backward computation.
+I0625 19:26:06.625077 14274 net.cpp:228] fc7_drop7_0_split does not need backward computation.
+I0625 19:26:06.625120 14274 net.cpp:228] drop7 does not need backward computation.
+I0625 19:26:06.625164 14274 net.cpp:228] relu7 does not need backward computation.
+I0625 19:26:06.625210 14274 net.cpp:228] fc7 does not need backward computation.
+I0625 19:26:06.625257 14274 net.cpp:228] drop6 does not need backward computation.
+I0625 19:26:06.625301 14274 net.cpp:228] relu6 does not need backward computation.
+I0625 19:26:06.625344 14274 net.cpp:228] fc6 does not need backward computation.
+I0625 19:26:06.625385 14274 net.cpp:228] roi_pool_conv5 does not need backward computation.
+I0625 19:26:06.625429 14274 net.cpp:228] proposal does not need backward computation.
+I0625 19:26:06.625474 14274 net.cpp:228] rpn_cls_prob_reshape does not need backward computation.
+I0625 19:26:06.625519 14274 net.cpp:228] rpn_cls_prob does not need backward computation.
+I0625 19:26:06.625561 14274 net.cpp:228] rpn_cls_score_reshape does not need backward computation.
+I0625 19:26:06.625605 14274 net.cpp:228] rpn_bbox_pred does not need backward computation.
+I0625 19:26:06.625653 14274 net.cpp:228] rpn_cls_score does not need backward computation.
+I0625 19:26:06.625700 14274 net.cpp:228] rpn/output_rpn_relu/3x3_0_split does not need backward computation.
+I0625 19:26:06.625744 14274 net.cpp:228] rpn_relu/3x3 does not need backward computation.
+I0625 19:26:06.625787 14274 net.cpp:228] rpn_conv/3x3 does not need backward computation.
+I0625 19:26:06.625831 14274 net.cpp:228] conv5_relu5_0_split does not need backward computation.
+I0625 19:26:06.625875 14274 net.cpp:228] relu5 does not need backward computation.
+I0625 19:26:06.625918 14274 net.cpp:228] conv5 does not need backward computation.
+I0625 19:26:06.625960 14274 net.cpp:228] relu4 does not need backward computation.
+I0625 19:26:06.626003 14274 net.cpp:228] conv4 does not need backward computation.
+I0625 19:26:06.626046 14274 net.cpp:228] relu3 does not need backward computation.
+I0625 19:26:06.626088 14274 net.cpp:228] conv3 does not need backward computation.
+I0625 19:26:06.626132 14274 net.cpp:228] pool2 does not need backward computation.
+I0625 19:26:06.626174 14274 net.cpp:228] norm2 does not need backward computation.
+I0625 19:26:06.626221 14274 net.cpp:228] relu2 does not need backward computation.
+I0625 19:26:06.626268 14274 net.cpp:228] conv2 does not need backward computation.
+I0625 19:26:06.626312 14274 net.cpp:228] pool1 does not need backward computation.
+I0625 19:26:06.626354 14274 net.cpp:228] norm1 does not need backward computation.
+I0625 19:26:06.626397 14274 net.cpp:228] relu1 does not need backward computation.
+I0625 19:26:06.626443 14274 net.cpp:228] conv1 does not need backward computation.
+I0625 19:26:06.626493 14274 net.cpp:270] This network produces output bbox_pred
+I0625 19:26:06.626538 14274 net.cpp:270] This network produces output cls_prob
+I0625 19:26:06.626611 14274 net.cpp:283] Network initialization done.
+I0625 19:26:08.825867 14274 net.cpp:816] Ignoring source layer input-data
+I0625 19:26:08.825888 14274 net.cpp:816] Ignoring source layer data_input-data_0_split
+I0625 19:26:08.825904 14274 net.cpp:816] Ignoring source layer im_info_input-data_1_split
+I0625 19:26:08.825906 14274 net.cpp:816] Ignoring source layer gt_boxes_input-data_2_split
+I0625 19:26:08.833834 14274 net.cpp:816] Ignoring source layer rpn_cls_score_rpn_cls_score_0_split
+I0625 19:26:08.833887 14274 net.cpp:816] Ignoring source layer rpn_bbox_pred_rpn_bbox_pred_0_split
+I0625 19:26:08.833891 14274 net.cpp:816] Ignoring source layer rpn_cls_score_reshape_rpn_cls_score_reshape_0_split
+I0625 19:26:08.833894 14274 net.cpp:816] Ignoring source layer rpn-data
+I0625 19:26:08.833896 14274 net.cpp:816] Ignoring source layer rpn_loss_cls
+I0625 19:26:08.833899 14274 net.cpp:816] Ignoring source layer rpn_loss_bbox
+I0625 19:26:08.833902 14274 net.cpp:816] Ignoring source layer roi-data
+I0625 19:26:08.901717 14274 net.cpp:816] Ignoring source layer loss_cls
+I0625 19:26:08.901733 14274 net.cpp:816] Ignoring source layer loss_bbox
+
+
+Loaded network roostModel2.caffemodel
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14546.jpg
+./images/14546.jpg
+troubleshooting
+images/14546.jpg
+Detection took 0.364s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14546.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/2938.jpg
+./images/2938.jpg
+troubleshooting
+images/2938.jpg
+Detection took 0.198s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/2938.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/2941.jpg
+./images/2941.jpg
+troubleshooting
+images/2941.jpg
+Detection took 0.121s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/2941.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/2965.jpg
+./images/2965.jpg
+troubleshooting
+images/2965.jpg
+Detection took 0.180s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/2965.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/2967.jpg
+./images/2967.jpg
+troubleshooting
+images/2967.jpg
+Detection took 0.209s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/2967.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/2995.jpg
+./images/2995.jpg
+troubleshooting
+images/2995.jpg
+Detection took 0.183s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/2995.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/2997.jpg
+./images/2997.jpg
+troubleshooting
+images/2997.jpg
+Detection took 0.198s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/2997.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3028.jpg
+./images/3028.jpg
+troubleshooting
+images/3028.jpg
+Detection took 0.135s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3028.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3030.jpg
+./images/3030.jpg
+troubleshooting
+images/3030.jpg
+Detection took 0.202s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3030.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3031.jpg
+./images/3031.jpg
+troubleshooting
+images/3031.jpg
+Detection took 0.151s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3031.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3063.jpg
+./images/3063.jpg
+troubleshooting
+images/3063.jpg
+Detection took 0.175s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3063.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3064.jpg
+./images/3064.jpg
+troubleshooting
+images/3064.jpg
+Detection took 0.175s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3064.xml
+3064.jpg
+detections
+2
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3065.jpg
+./images/3065.jpg
+troubleshooting
+images/3065.jpg
+Detection took 0.204s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3065.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3066.jpg
+./images/3066.jpg
+troubleshooting
+images/3066.jpg
+Detection took 0.158s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3066.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3067.jpg
+./images/3067.jpg
+troubleshooting
+images/3067.jpg
+Detection took 0.233s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3067.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3095.jpg
+./images/3095.jpg
+troubleshooting
+images/3095.jpg
+Detection took 0.231s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3095.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3096.jpg
+./images/3096.jpg
+troubleshooting
+images/3096.jpg
+Detection took 0.176s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3096.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3127.jpg
+./images/3127.jpg
+troubleshooting
+images/3127.jpg
+Detection took 0.193s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3127.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3128.jpg
+./images/3128.jpg
+troubleshooting
+images/3128.jpg
+Detection took 0.173s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3128.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3234.jpg
+./images/3234.jpg
+troubleshooting
+images/3234.jpg
+Detection took 0.176s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3234.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3235.jpg
+./images/3235.jpg
+troubleshooting
+images/3235.jpg
+Detection took 0.154s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3235.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3236.jpg
+./images/3236.jpg
+troubleshooting
+images/3236.jpg
+Detection took 0.125s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3236.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3271.jpg
+./images/3271.jpg
+troubleshooting
+images/3271.jpg
+Detection took 0.215s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3271.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3293.jpg
+./images/3293.jpg
+troubleshooting
+images/3293.jpg
+Detection took 0.141s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3293.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3294.jpg
+./images/3294.jpg
+troubleshooting
+images/3294.jpg
+Detection took 0.192s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3294.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3295.jpg
+./images/3295.jpg
+troubleshooting
+images/3295.jpg
+Detection took 0.171s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3295.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3296.jpg
+./images/3296.jpg
+troubleshooting
+images/3296.jpg
+Detection took 0.118s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3296.xml
+3296.jpg
+detections
+2
+roosts
+3
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3317.jpg
+./images/3317.jpg
+troubleshooting
+images/3317.jpg
+Detection took 0.142s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3317.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3350.jpg
+./images/3350.jpg
+troubleshooting
+images/3350.jpg
+Detection took 0.239s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3350.xml
+3350.jpg
+detections
+1
+roosts
+5
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3355.jpg
+./images/3355.jpg
+troubleshooting
+images/3355.jpg
+Detection took 0.152s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3355.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3356.jpg
+./images/3356.jpg
+troubleshooting
+images/3356.jpg
+Detection took 0.181s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3356.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3357.jpg
+./images/3357.jpg
+troubleshooting
+images/3357.jpg
+Detection took 0.119s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3357.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3387.jpg
+./images/3387.jpg
+troubleshooting
+images/3387.jpg
+Detection took 0.167s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3387.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3418.jpg
+./images/3418.jpg
+troubleshooting
+images/3418.jpg
+Detection took 0.178s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3418.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3447.jpg
+./images/3447.jpg
+troubleshooting
+images/3447.jpg
+Detection took 0.121s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3447.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3472.jpg
+./images/3472.jpg
+troubleshooting
+images/3472.jpg
+Detection took 0.214s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3472.xml
+3472.jpg
+detections
+1
+roosts
+5
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3477.jpg
+./images/3477.jpg
+troubleshooting
+images/3477.jpg
+Detection took 0.177s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3477.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3496.jpg
+./images/3496.jpg
+troubleshooting
+images/3496.jpg
+Detection took 0.123s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3496.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3500.jpg
+./images/3500.jpg
+troubleshooting
+images/3500.jpg
+Detection took 0.198s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3500.xml
+3500.jpg
+detections
+2
+roosts
+3
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3501.jpg
+./images/3501.jpg
+troubleshooting
+images/3501.jpg
+Detection took 0.171s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3501.xml
+3501.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3503.jpg
+./images/3503.jpg
+troubleshooting
+images/3503.jpg
+Detection took 0.149s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3503.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3526.jpg
+./images/3526.jpg
+troubleshooting
+images/3526.jpg
+Detection took 0.168s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3526.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3617.jpg
+./images/3617.jpg
+troubleshooting
+images/3617.jpg
+Detection took 0.137s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3617.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3619.jpg
+./images/3619.jpg
+troubleshooting
+images/3619.jpg
+Detection took 0.182s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3619.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3638.jpg
+./images/3638.jpg
+troubleshooting
+images/3638.jpg
+Detection took 0.158s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3638.xml
+3638.jpg
+detections
+2
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3640.jpg
+./images/3640.jpg
+troubleshooting
+images/3640.jpg
+Detection took 0.193s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3640.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3642.jpg
+./images/3642.jpg
+troubleshooting
+images/3642.jpg
+Detection took 0.136s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3642.xml
+3642.jpg
+detections
+2
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3669.jpg
+./images/3669.jpg
+troubleshooting
+images/3669.jpg
+Detection took 0.124s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3669.xml
+3669.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3671.jpg
+./images/3671.jpg
+troubleshooting
+images/3671.jpg
+Detection took 0.175s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3671.xml
+3671.jpg
+detections
+3
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3696.jpg
+./images/3696.jpg
+troubleshooting
+images/3696.jpg
+Detection took 0.177s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3696.xml
+3696.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3697.jpg
+./images/3697.jpg
+troubleshooting
+images/3697.jpg
+Detection took 0.191s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3697.xml
+3697.jpg
+detections
+3
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3700.jpg
+./images/3700.jpg
+troubleshooting
+images/3700.jpg
+Detection took 0.183s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3700.xml
+3700.jpg
+detections
+1
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3723.jpg
+./images/3723.jpg
+troubleshooting
+images/3723.jpg
+Detection took 0.184s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3723.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3726.jpg
+./images/3726.jpg
+troubleshooting
+images/3726.jpg
+Detection took 0.192s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3726.xml
+3726.jpg
+detections
+1
+roosts
+5
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3730.jpg
+./images/3730.jpg
+troubleshooting
+images/3730.jpg
+Detection took 0.138s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3730.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3731.jpg
+./images/3731.jpg
+troubleshooting
+images/3731.jpg
+Detection took 0.172s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3731.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3753.jpg
+./images/3753.jpg
+troubleshooting
+images/3753.jpg
+Detection took 0.156s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3753.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3756.jpg
+./images/3756.jpg
+troubleshooting
+images/3756.jpg
+Detection took 0.125s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3756.xml
+3756.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3780.jpg
+./images/3780.jpg
+troubleshooting
+images/3780.jpg
+Detection took 0.169s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3780.xml
+3780.jpg
+detections
+2
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/3786.jpg
+./images/3786.jpg
+troubleshooting
+images/3786.jpg
+Detection took 0.133s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/3786.xml
+3786.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/8194.jpg
+./images/8194.jpg
+troubleshooting
+images/8194.jpg
+Detection took 0.249s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/8194.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/8374.jpg
+./images/8374.jpg
+troubleshooting
+images/8374.jpg
+Detection took 0.147s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/8374.xml
+8374.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/8376.jpg
+./images/8376.jpg
+troubleshooting
+images/8376.jpg
+Detection took 0.132s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/8376.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/9659.jpg
+./images/9659.jpg
+troubleshooting
+images/9659.jpg
+Detection took 0.189s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/9659./cm/shared/apps/cm-ml-pythondeps/lib64/python2.7/site-packages/matplotlib/pyplot.py:516: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
+  max_open_warning, RuntimeWarning)
+xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/9661.jpg
+./images/9661.jpg
+troubleshooting
+images/9661.jpg
+Detection took 0.139s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/9661.xml
+9661.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/9663.jpg
+./images/9663.jpg
+troubleshooting
+images/9663.jpg
+Detection took 0.193s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/9663.xml
+9663.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/9665.jpg
+./images/9665.jpg
+troubleshooting
+images/9665.jpg
+Detection took 0.197s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/9665.xml
+9665.jpg
+detections
+4
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/9699.jpg
+./images/9699.jpg
+troubleshooting
+images/9699.jpg
+Detection took 0.195s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/9699.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/9702.jpg
+./images/9702.jpg
+troubleshooting
+images/9702.jpg
+Detection took 0.192s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/9702.xml
+9702.jpg
+detections
+2
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/9729.jpg
+./images/9729.jpg
+troubleshooting
+images/9729.jpg
+Detection took 0.190s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/9729.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/9731.jpg
+./images/9731.jpg
+troubleshooting
+images/9731.jpg
+Detection took 0.173s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/9731.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/9732.jpg
+./images/9732.jpg
+troubleshooting
+images/9732.jpg
+Detection took 0.163s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/9732.xml
+9732.jpg
+detections
+1
+roosts
+3
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/9733.jpg
+./images/9733.jpg
+troubleshooting
+images/9733.jpg
+Detection took 0.118s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/9733.xml
+9733.jpg
+detections
+2
+roosts
+3
+True Positives
+2
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/9735.jpg
+./images/9735.jpg
+troubleshooting
+images/9735.jpg
+Detection took 0.168s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/9735.xml
+9735.jpg
+detections
+1
+roosts
+3
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/9765.jpg
+./images/9765.jpg
+troubleshooting
+images/9765.jpg
+Detection took 0.165s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/9765.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10485.jpg
+./images/10485.jpg
+troubleshooting
+images/10485.jpg
+Detection took 0.139s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10485.xml
+10485.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10488.jpg
+./images/10488.jpg
+troubleshooting
+images/10488.jpg
+Detection took 0.138s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10488.xml
+10488.jpg
+detections
+8
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10489.jpg
+./images/10489.jpg
+troubleshooting
+images/10489.jpg
+Detection took 0.136s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10489.xml
+10489.jpg
+detections
+3
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10531.jpg
+./images/10531.jpg
+troubleshooting
+images/10531.jpg
+Detection took 0.131s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10531.xml
+10531.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10532.jpg
+./images/10532.jpg
+troubleshooting
+images/10532.jpg
+Detection took 0.214s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10532.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10696.jpg
+./images/10696.jpg
+troubleshooting
+images/10696.jpg
+Detection took 0.124s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10696.xml
+10696.jpg
+detections
+1
+roosts
+5
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10698.jpg
+./images/10698.jpg
+troubleshooting
+images/10698.jpg
+Detection took 0.126s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10698.xml
+10698.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10715.jpg
+./images/10715.jpg
+troubleshooting
+images/10715.jpg
+Detection took 0.136s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10715.xml
+10715.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10716.jpg
+./images/10716.jpg
+troubleshooting
+images/10716.jpg
+Detection took 0.186s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10716.xml
+10716.jpg
+detections
+3
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10732.jpg
+./images/10732.jpg
+troubleshooting
+images/10732.jpg
+Detection took 0.227s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10732.xml
+10732.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10733.jpg
+./images/10733.jpg
+troubleshooting
+images/10733.jpg
+Detection took 0.229s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10733.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10750.jpg
+./images/10750.jpg
+troubleshooting
+images/10750.jpg
+Detection took 0.144s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10750.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10753.jpg
+./images/10753.jpg
+troubleshooting
+images/10753.jpg
+Detection took 0.260s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10753.xml
+10753.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10771.jpg
+./images/10771.jpg
+troubleshooting
+images/10771.jpg
+Detection took 0.182s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10771.xml
+10771.jpg
+detections
+1
+roosts
+3
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10772.jpg
+./images/10772.jpg
+troubleshooting
+images/10772.jpg
+Detection took 0.187s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10772.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10773.jpg
+./images/10773.jpg
+troubleshooting
+images/10773.jpg
+Detection took 0.182s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10773.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10856.jpg
+./images/10856.jpg
+troubleshooting
+images/10856.jpg
+Detection took 0.248s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10856.xml
+10856.jpg
+detections
+1
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10881.jpg
+./images/10881.jpg
+troubleshooting
+images/10881.jpg
+Detection took 0.173s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10881.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10923.jpg
+./images/10923.jpg
+troubleshooting
+images/10923.jpg
+Detection took 0.115s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10923.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10926.jpg
+./images/10926.jpg
+troubleshooting
+images/10926.jpg
+Detection took 0.201s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10926.xml
+10926.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10974.jpg
+./images/10974.jpg
+troubleshooting
+images/10974.jpg
+Detection took 0.180s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10974.xml
+10974.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/10975.jpg
+./images/10975.jpg
+troubleshooting
+images/10975.jpg
+Detection took 0.128s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/10975.xml
+10975.jpg
+detections
+1
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11011.jpg
+./images/11011.jpg
+troubleshooting
+images/11011.jpg
+Detection took 0.162s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11011.xml
+11011.jpg
+detections
+4
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11028.jpg
+./images/11028.jpg
+troubleshooting
+images/11028.jpg
+Detection took 0.156s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11028.xml
+11028.jpg
+detections
+3
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11029.jpg
+./images/11029.jpg
+troubleshooting
+images/11029.jpg
+Detection took 0.115s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11029.xml
+11029.jpg
+detections
+3
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11030.jpg
+./images/11030.jpg
+troubleshooting
+images/11030.jpg
+Detection took 0.185s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11030.xml
+11030.jpg
+detections
+2
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11031.jpg
+./images/11031.jpg
+troubleshooting
+images/11031.jpg
+Detection took 0.124s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11031.xml
+11031.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11048.jpg
+./images/11048.jpg
+troubleshooting
+images/11048.jpg
+Detection took 0.159s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11048.xml
+11048.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11049.jpg
+./images/11049.jpg
+troubleshooting
+images/11049.jpg
+Detection took 0.124s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11049.xml
+11049.jpg
+detections
+1
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11069.jpg
+./images/11069.jpg
+troubleshooting
+images/11069.jpg
+Detection took 0.167s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11069.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11088.jpg
+./images/11088.jpg
+troubleshooting
+images/11088.jpg
+Detection took 0.162s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11088.xml
+11088.jpg
+detections
+1
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11089.jpg
+./images/11089.jpg
+troubleshooting
+images/11089.jpg
+Detection took 0.178s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11089.xml
+11089.jpg
+detections
+1
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11104.jpg
+./images/11104.jpg
+troubleshooting
+images/11104.jpg
+Detection took 0.181s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11104.xml
+11104.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11105.jpg
+./images/11105.jpg
+troubleshooting
+images/11105.jpg
+Detection took 0.167s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11105.xml
+11105.jpg
+detections
+3
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11108.jpg
+./images/11108.jpg
+troubleshooting
+images/11108.jpg
+Detection took 0.182s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11108.xml
+11108.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11151.jpg
+./images/11151.jpg
+troubleshooting
+images/11151.jpg
+Detection took 0.189s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11151.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11848.jpg
+./images/11848.jpg
+troubleshooting
+images/11848.jpg
+Detection took 0.226s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11848.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11850.jpg
+./images/11850.jpg
+troubleshooting
+images/11850.jpg
+Detection took 0.160s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11850.xml
+11850.jpg
+detections
+4
+roosts
+7
+True Positives
+4
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11858.jpg
+./images/11858.jpg
+troubleshooting
+images/11858.jpg
+Detection took 0.140s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11858.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11861.jpg
+./images/11861.jpg
+troubleshooting
+images/11861.jpg
+Detection took 0.192s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11861.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11865.jpg
+./images/11865.jpg
+troubleshooting
+images/11865.jpg
+Detection took 0.122s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11865.xml
+11865.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11872.jpg
+./images/11872.jpg
+troubleshooting
+images/11872.jpg
+Detection took 0.163s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11872.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11873.jpg
+./images/11873.jpg
+troubleshooting
+images/11873.jpg
+Detection took 0.160s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11873.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11889.jpg
+./images/11889.jpg
+troubleshooting
+images/11889.jpg
+Detection took 0.202s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11889.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11891.jpg
+./images/11891.jpg
+troubleshooting
+images/11891.jpg
+Detection took 0.203s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11891.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11894.jpg
+./images/11894.jpg
+troubleshooting
+images/11894.jpg
+Detection took 0.161s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11894.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11926.jpg
+./images/11926.jpg
+troubleshooting
+images/11926.jpg
+Detection took 0.113s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11926.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11938.jpg
+./images/11938.jpg
+troubleshooting
+images/11938.jpg
+Detection took 0.169s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11938.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11951.jpg
+./images/11951.jpg
+troubleshooting
+images/11951.jpg
+Detection took 0.178s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11951.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11953.jpg
+./images/11953.jpg
+troubleshooting
+images/11953.jpg
+Detection took 0.136s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11953.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11954.jpg
+./images/11954.jpg
+troubleshooting
+images/11954.jpg
+Detection took 0.182s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11954.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/11955.jpg
+./images/11955.jpg
+troubleshooting
+images/11955.jpg
+Detection took 0.161s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/11955.xml
+11955.jpg
+detections
+1
+roosts
+7
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/12007.jpg
+./images/12007.jpg
+troubleshooting
+images/12007.jpg
+Detection took 0.225s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/12007.xml
+12007.jpg
+detections
+1
+roosts
+5
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/12008.jpg
+./images/12008.jpg
+troubleshooting
+images/12008.jpg
+Detection took 0.198s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/12008.xml
+12008.jpg
+detections
+1
+roosts
+6
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/12056.jpg
+./images/12056.jpg
+troubleshooting
+images/12056.jpg
+Detection took 0.185s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/12056.xml
+12056.jpg
+detections
+2
+roosts
+4
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/12057.jpg
+./images/12057.jpg
+troubleshooting
+images/12057.jpg
+Detection took 0.187s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/12057.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/12059.jpg
+./images/12059.jpg
+troubleshooting
+images/12059.jpg
+Detection took 0.146s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/12059.xml
+12059.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/12065.jpg
+./images/12065.jpg
+troubleshooting
+images/12065.jpg
+Detection took 0.132s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/12065.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/12067.jpg
+./images/12067.jpg
+troubleshooting
+images/12067.jpg
+Detection took 0.279s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/12067.xml
+12067.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/12068.jpg
+./images/12068.jpg
+troubleshooting
+images/12068.jpg
+Detection took 0.192s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/12068.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/12111.jpg
+./images/12111.jpg
+troubleshooting
+images/12111.jpg
+Detection took 0.160s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/12111.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/12114.jpg
+./images/12114.jpg
+troubleshooting
+images/12114.jpg
+Detection took 0.225s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/12114.xml
+12114.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/12131.jpg
+./images/12131.jpg
+troubleshooting
+images/12131.jpg
+Detection took 0.117s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/12131.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/13341.jpg
+./images/13341.jpg
+troubleshooting
+images/13341.jpg
+Detection took 0.225s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/13341.xml
+13341.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/13372.jpg
+./images/13372.jpg
+troubleshooting
+images/13372.jpg
+Detection took 0.202s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/13372.xml
+13372.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/13376.jpg
+./images/13376.jpg
+troubleshooting
+images/13376.jpg
+Detection took 0.204s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/13376.xml
+13376.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/13378.jpg
+./images/13378.jpg
+troubleshooting
+images/13378.jpg
+Detection took 0.197s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/13378.xml
+13378.jpg
+detections
+3
+roosts
+1
+True Positives
+2
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/13416.jpg
+./images/13416.jpg
+troubleshooting
+images/13416.jpg
+Detection took 0.192s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/13416.xml
+13416.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/13456.jpg
+./images/13456.jpg
+troubleshooting
+images/13456.jpg
+Detection took 0.192s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/13456.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/13457.jpg
+./images/13457.jpg
+troubleshooting
+images/13457.jpg
+Detection took 0.166s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/13457.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/13458.jpg
+./images/13458.jpg
+troubleshooting
+images/13458.jpg
+Detection took 0.196s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/13458.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/13460.jpg
+./images/13460.jpg
+troubleshooting
+images/13460.jpg
+Detection took 0.207s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/13460.xml
+13460.jpg
+detections
+2
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/13488.jpg
+./images/13488.jpg
+troubleshooting
+images/13488.jpg
+Detection took 0.183s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/13488.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/13512.jpg
+./images/13512.jpg
+troubleshooting
+images/13512.jpg
+Detection took 0.188s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/13512.xml
+13512.jpg
+detections
+1
+roosts
+5
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/13513.jpg
+./images/13513.jpg
+troubleshooting
+images/13513.jpg
+Detection took 0.158s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/13513.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/13514.jpg
+./images/13514.jpg
+troubleshooting
+images/13514.jpg
+Detection took 0.183s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/13514.xml
+13514.jpg
+detections
+1
+roosts
+4
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/13538.jpg
+./images/13538.jpg
+troubleshooting
+images/13538.jpg
+Detection took 0.217s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/13538.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/13539.jpg
+./images/13539.jpg
+troubleshooting
+images/13539.jpg
+Detection took 0.151s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/13539.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/13564.jpg
+./images/13564.jpg
+troubleshooting
+images/13564.jpg
+Detection took 0.231s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/13564.xml
+13564.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14390.jpg
+./images/14390.jpg
+troubleshooting
+images/14390.jpg
+Detection took 0.168s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14390.xml
+14390.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14391.jpg
+./images/14391.jpg
+troubleshooting
+images/14391.jpg
+Detection took 0.203s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14391.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14393.jpg
+./images/14393.jpg
+troubleshooting
+images/14393.jpg
+Detection took 0.143s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14393.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14412.jpg
+./images/14412.jpg
+troubleshooting
+images/14412.jpg
+Detection took 0.205s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14412.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14416.jpg
+./images/14416.jpg
+troubleshooting
+images/14416.jpg
+Detection took 0.157s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14416.xml
+14416.jpg
+detections
+1
+roosts
+3
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14430.jpg
+./images/14430.jpg
+troubleshooting
+images/14430.jpg
+Detection took 0.116s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14430.xml
+14430.jpg
+detections
+6
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14431.jpg
+./images/14431.jpg
+troubleshooting
+images/14431.jpg
+Detection took 0.140s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14431.xml
+14431.jpg
+detections
+2
+roosts
+5
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14432.jpg
+./images/14432.jpg
+troubleshooting
+images/14432.jpg
+Detection took 0.121s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14432.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14547.jpg
+./images/14547.jpg
+troubleshooting
+images/14547.jpg
+Detection took 0.207s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14547.xml
+14547.jpg
+detections
+1
+roosts
+6
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14549.jpg
+./images/14549.jpg
+troubleshooting
+images/14549.jpg
+Detection took 0.183s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14549.xml
+14549.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14582.jpg
+./images/14582.jpg
+troubleshooting
+images/14582.jpg
+Detection took 0.117s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14582.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14583.jpg
+./images/14583.jpg
+troubleshooting
+images/14583.jpg
+Detection took 0.116s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14583.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14584.jpg
+./images/14584.jpg
+troubleshooting
+images/14584.jpg
+Detection took 0.113s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14584.xml
+14584.jpg
+detections
+1
+roosts
+8
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14588.jpg
+./images/14588.jpg
+troubleshooting
+images/14588.jpg
+Detection took 0.114s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14588.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14666.jpg
+./images/14666.jpg
+troubleshooting
+images/14666.jpg
+Detection took 0.159s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14666.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14667.jpg
+./images/14667.jpg
+troubleshooting
+images/14667.jpg
+Detection took 0.182s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14667.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14670.jpg
+./images/14670.jpg
+troubleshooting
+images/14670.jpg
+Detection took 0.165s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14670.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/14672.jpg
+./images/14672.jpg
+troubleshooting
+images/14672.jpg
+Detection took 0.254s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/14672.xml
+14672.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15013.jpg
+./images/15013.jpg
+troubleshooting
+images/15013.jpg
+Detection took 0.160s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15013.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15016.jpg
+./images/15016.jpg
+troubleshooting
+images/15016.jpg
+Detection took 0.179s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15016.xml
+15016.jpg
+detections
+1
+roosts
+4
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15019.jpg
+./images/15019.jpg
+troubleshooting
+images/15019.jpg
+Detection took 0.173s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15019.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15020.jpg
+./images/15020.jpg
+troubleshooting
+images/15020.jpg
+Detection took 0.131s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15020.xml
+15020.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15021.jpg
+./images/15021.jpg
+troubleshooting
+images/15021.jpg
+Detection took 0.180s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15021.xml
+15021.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15110.jpg
+./images/15110.jpg
+troubleshooting
+images/15110.jpg
+Detection took 0.208s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15110.xml
+15110.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15111.jpg
+./images/15111.jpg
+troubleshooting
+images/15111.jpg
+Detection took 0.184s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15111.xml
+15111.jpg
+detections
+1
+roosts
+5
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15113.jpg
+./images/15113.jpg
+troubleshooting
+images/15113.jpg
+Detection took 0.196s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15113.xml
+15113.jpg
+detections
+1
+roosts
+5
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15115.jpg
+./images/15115.jpg
+troubleshooting
+images/15115.jpg
+Detection took 0.223s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15115.xml
+15115.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15117.jpg
+./images/15117.jpg
+troubleshooting
+images/15117.jpg
+Detection took 0.191s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15117.xml
+15117.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15119.jpg
+./images/15119.jpg
+troubleshooting
+images/15119.jpg
+Detection took 0.190s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15119.xml
+15119.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15121.jpg
+./images/15121.jpg
+troubleshooting
+images/15121.jpg
+Detection took 0.181s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15121.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15214.jpg
+./images/15214.jpg
+troubleshooting
+images/15214.jpg
+Detection took 0.221s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15214.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15215.jpg
+./images/15215.jpg
+troubleshooting
+images/15215.jpg
+Detection took 0.198s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15215.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15216.jpg
+./images/15216.jpg
+troubleshooting
+images/15216.jpg
+Detection took 0.181s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15216.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15217.jpg
+./images/15217.jpg
+troubleshooting
+images/15217.jpg
+Detection took 0.127s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15217.xml
+15217.jpg
+detections
+1
+roosts
+7
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15237.jpg
+./images/15237.jpg
+troubleshooting
+images/15237.jpg
+Detection took 0.144s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15237.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15239.jpg
+./images/15239.jpg
+troubleshooting
+images/15239.jpg
+Detection took 0.170s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15239.xml
+15239.jpg
+detections
+1
+roosts
+9
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15240.jpg
+./images/15240.jpg
+troubleshooting
+images/15240.jpg
+Detection took 0.167s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15240.xml
+15240.jpg
+detections
+1
+roosts
+8
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15244.jpg
+./images/15244.jpg
+troubleshooting
+images/15244.jpg
+Detection took 0.172s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15244.xml
+15244.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15245.jpg
+./images/15245.jpg
+troubleshooting
+images/15245.jpg
+Detection took 0.142s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15245.xml
+15245.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15247.jpg
+./images/15247.jpg
+troubleshooting
+images/15247.jpg
+Detection took 0.140s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15247.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15248.jpg
+./images/15248.jpg
+troubleshooting
+images/15248.jpg
+Detection took 0.180s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15248.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15251.jpg
+./images/15251.jpg
+troubleshooting
+images/15251.jpg
+Detection took 0.170s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15251.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15296.jpg
+./images/15296.jpg
+troubleshooting
+images/15296.jpg
+Detection took 0.178s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15296.xml
+15296.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15317.jpg
+./images/15317.jpg
+troubleshooting
+images/15317.jpg
+Detection took 0.187s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15317.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15348.jpg
+./images/15348.jpg
+troubleshooting
+images/15348.jpg
+Detection took 0.139s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15348.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15374.jpg
+./images/15374.jpg
+troubleshooting
+images/15374.jpg
+Detection took 0.126s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15374.xml
+15374.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15375.jpg
+./images/15375.jpg
+troubleshooting
+images/15375.jpg
+Detection took 0.194s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15375.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15376.jpg
+./images/15376.jpg
+troubleshooting
+images/15376.jpg
+Detection took 0.169s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15376.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15378.jpg
+./images/15378.jpg
+troubleshooting
+images/15378.jpg
+Detection took 0.179s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15378.xml
+15378.jpg
+detections
+1
+roosts
+3
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15402.jpg
+./images/15402.jpg
+troubleshooting
+images/15402.jpg
+Detection took 0.172s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15402.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15405.jpg
+./images/15405.jpg
+troubleshooting
+images/15405.jpg
+Detection took 0.156s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15405.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15432.jpg
+./images/15432.jpg
+troubleshooting
+images/15432.jpg
+Detection took 0.184s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15432.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15468.jpg
+./images/15468.jpg
+troubleshooting
+images/15468.jpg
+Detection took 0.148s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15468.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15496.jpg
+./images/15496.jpg
+troubleshooting
+images/15496.jpg
+Detection took 0.182s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15496.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15497.jpg
+./images/15497.jpg
+troubleshooting
+images/15497.jpg
+Detection took 0.170s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15497.xml
+15497.jpg
+detections
+2
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/15498.jpg
+./images/15498.jpg
+troubleshooting
+images/15498.jpg
+Detection took 0.185s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/15498.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/17013.jpg
+./images/17013.jpg
+troubleshooting
+images/17013.jpg
+Detection took 0.321s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/17013.xml
+17013.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/17014.jpg
+./images/17014.jpg
+troubleshooting
+images/17014.jpg
+Detection took 0.182s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/17014.xml
+17014.jpg
+detections
+6
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/17015.jpg
+./images/17015.jpg
+troubleshooting
+images/17015.jpg
+Detection took 0.170s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/17015.xml
+17015.jpg
+detections
+3
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/17062.jpg
+./images/17062.jpg
+troubleshooting
+images/17062.jpg
+Detection took 0.166s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/17062.xml
+17062.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/17063.jpg
+./images/17063.jpg
+troubleshooting
+images/17063.jpg
+Detection took 0.148s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/17063.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/17080.jpg
+./images/17080.jpg
+troubleshooting
+images/17080.jpg
+Detection took 0.245s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/17080.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/17106.jpg
+./images/17106.jpg
+troubleshooting
+images/17106.jpg
+Detection took 0.131s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/17106.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/17133.jpg
+./images/17133.jpg
+troubleshooting
+images/17133.jpg
+Detection took 0.279s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/17133.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/17134.jpg
+./images/17134.jpg
+troubleshooting
+images/17134.jpg
+Detection took 0.192s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/17134.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/17135.jpg
+./images/17135.jpg
+troubleshooting
+images/17135.jpg
+Detection took 0.177s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/17135.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/17136.jpg
+./images/17136.jpg
+troubleshooting
+images/17136.jpg
+Detection took 0.162s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/17136.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/17161.jpg
+./images/17161.jpg
+troubleshooting
+images/17161.jpg
+Detection took 0.225s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/17161.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/17204.jpg
+./images/17204.jpg
+troubleshooting
+images/17204.jpg
+Detection took 0.158s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/17204.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/23761.jpg
+./images/23761.jpg
+troubleshooting
+images/23761.jpg
+Detection took 0.201s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/23761.xml
+23761.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/23762.jpg
+./images/23762.jpg
+troubleshooting
+images/23762.jpg
+Detection took 0.178s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/23762.xml
+23762.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/23763.jpg
+./images/23763.jpg
+troubleshooting
+images/23763.jpg
+Detection took 0.133s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/23763.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/23767.jpg
+./images/23767.jpg
+troubleshooting
+images/23767.jpg
+Detection took 0.192s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/23767.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/24049.jpg
+./images/24049.jpg
+troubleshooting
+images/24049.jpg
+Detection took 0.150s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/24049.xml
+24049.jpg
+detections
+2
+roosts
+2
+True Positives
+2
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/24281.jpg
+./images/24281.jpg
+troubleshooting
+images/24281.jpg
+Detection took 0.158s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/24281.xml
+24281.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/24282.jpg
+./images/24282.jpg
+troubleshooting
+images/24282.jpg
+Detection took 0.120s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/24282.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/24799.jpg
+./images/24799.jpg
+troubleshooting
+images/24799.jpg
+Detection took 0.287s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/24799.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/24802.jpg
+./images/24802.jpg
+troubleshooting
+images/24802.jpg
+Detection took 0.116s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/24802.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/25080.jpg
+./images/25080.jpg
+troubleshooting
+images/25080.jpg
+Detection took 0.159s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/25080.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/25081.jpg
+./images/25081.jpg
+troubleshooting
+images/25081.jpg
+Detection took 0.206s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/25081.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/25355.jpg
+./images/25355.jpg
+troubleshooting
+images/25355.jpg
+Detection took 0.245s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/25355.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/25356.jpg
+./images/25356.jpg
+troubleshooting
+images/25356.jpg
+Detection took 0.186s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/25356.xml
+25356.jpg
+detections
+2
+roosts
+5
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/25358.jpg
+./images/25358.jpg
+troubleshooting
+images/25358.jpg
+Detection took 0.137s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/25358.xml
+25358.jpg
+detections
+1
+roosts
+4
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/25360.jpg
+./images/25360.jpg
+troubleshooting
+images/25360.jpg
+Detection took 0.152s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/25360.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/25647.jpg
+./images/25647.jpg
+troubleshooting
+images/25647.jpg
+Detection took 0.123s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/25647.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/25648.jpg
+./images/25648.jpg
+troubleshooting
+images/25648.jpg
+Detection took 0.162s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/25648.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/26011.jpg
+./images/26011.jpg
+troubleshooting
+images/26011.jpg
+Detection took 0.232s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/26011.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/26017.jpg
+./images/26017.jpg
+troubleshooting
+images/26017.jpg
+Detection took 0.176s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/26017.xml
+26017.jpg
+detections
+1
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/26020.jpg
+./images/26020.jpg
+troubleshooting
+images/26020.jpg
+Detection took 0.158s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/26020.xml
+26020.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/26022.jpg
+./images/26022.jpg
+troubleshooting
+images/26022.jpg
+Detection took 0.130s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/26022.xml
+26022.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/26068.jpg
+./images/26068.jpg
+troubleshooting
+images/26068.jpg
+Detection took 0.120s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/26068.xml
+26068.jpg
+detections
+2
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/26081.jpg
+./images/26081.jpg
+troubleshooting
+images/26081.jpg
+Detection took 0.187s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/26081.xml
+26081.jpg
+detections
+4
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/26084.jpg
+./images/26084.jpg
+troubleshooting
+images/26084.jpg
+Detection took 0.168s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/26084.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/26085.jpg
+./images/26085.jpg
+troubleshooting
+images/26085.jpg
+Detection took 0.140s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/26085.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/27189.jpg
+./images/27189.jpg
+troubleshooting
+images/27189.jpg
+Detection took 0.184s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/27189.xml
+27189.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/27190.jpg
+./images/27190.jpg
+troubleshooting
+images/27190.jpg
+Detection took 0.169s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/27190.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/27191.jpg
+./images/27191.jpg
+troubleshooting
+images/27191.jpg
+Detection took 0.175s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/27191.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/27192.jpg
+./images/27192.jpg
+troubleshooting
+images/27192.jpg
+Detection took 0.156s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/27192.xml
+27192.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/27197.jpg
+./images/27197.jpg
+troubleshooting
+images/27197.jpg
+Detection took 0.122s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/27197.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/27706.jpg
+./images/27706.jpg
+troubleshooting
+images/27706.jpg
+Detection took 0.141s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/27706.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/27709.jpg
+./images/27709.jpg
+troubleshooting
+images/27709.jpg
+Detection took 0.168s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/27709.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/27713.jpg
+./images/27713.jpg
+troubleshooting
+images/27713.jpg
+Detection took 0.123s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/27713.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/27714.jpg
+./images/27714.jpg
+troubleshooting
+images/27714.jpg
+Detection took 0.170s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/27714.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/27715.jpg
+./images/27715.jpg
+troubleshooting
+images/27715.jpg
+Detection took 0.167s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/27715.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/27716.jpg
+./images/27716.jpg
+troubleshooting
+images/27716.jpg
+Detection took 0.108s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/27716.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/27744.jpg
+./images/27744.jpg
+troubleshooting
+images/27744.jpg
+Detection took 0.213s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/27744.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/27745.jpg
+./images/27745.jpg
+troubleshooting
+images/27745.jpg
+Detection took 0.177s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/27745.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/27749.jpg
+./images/27749.jpg
+troubleshooting
+images/27749.jpg
+Detection took 0.128s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/27749.xml
+27749.jpg
+detections
+1
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/27750.jpg
+./images/27750.jpg
+troubleshooting
+images/27750.jpg
+Detection took 0.118s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/27750.xml
+27750.jpg
+detections
+1
+roosts
+3
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/27751.jpg
+./images/27751.jpg
+troubleshooting
+images/27751.jpg
+Detection took 0.156s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/27751.xml
+27751.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/28228.jpg
+./images/28228.jpg
+troubleshooting
+images/28228.jpg
+Detection took 0.137s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/28228.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/28476.jpg
+./images/28476.jpg
+troubleshooting
+images/28476.jpg
+Detection took 0.168s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/28476.xml
+28476.jpg
+detections
+2
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/28478.jpg
+./images/28478.jpg
+troubleshooting
+images/28478.jpg
+Detection took 0.119s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/28478.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/28723.jpg
+./images/28723.jpg
+troubleshooting
+images/28723.jpg
+Detection took 0.187s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/28723.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/28725.jpg
+./images/28725.jpg
+troubleshooting
+images/28725.jpg
+Detection took 0.162s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/28725.xml
+28725.jpg
+detections
+2
+roosts
+3
+True Positives
+2
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/28726.jpg
+./images/28726.jpg
+troubleshooting
+images/28726.jpg
+Detection took 0.189s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/28726.xml
+28726.jpg
+detections
+1
+roosts
+3
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/28974.jpg
+./images/28974.jpg
+troubleshooting
+images/28974.jpg
+Detection took 0.193s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/28974.xml
+28974.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/29444.jpg
+./images/29444.jpg
+troubleshooting
+images/29444.jpg
+Detection took 0.159s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/29444.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/29445.jpg
+./images/29445.jpg
+troubleshooting
+images/29445.jpg
+Detection took 0.179s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/29445.xml
+29445.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/29446.jpg
+./images/29446.jpg
+troubleshooting
+images/29446.jpg
+Detection took 0.247s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/29446.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/29447.jpg
+./images/29447.jpg
+troubleshooting
+images/29447.jpg
+Detection took 0.134s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/29447.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/30301.jpg
+./images/30301.jpg
+troubleshooting
+images/30301.jpg
+Detection took 0.194s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/30301.xml
+30301.jpg
+detections
+1
+roosts
+3
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/30814.jpg
+./images/30814.jpg
+troubleshooting
+images/30814.jpg
+Detection took 0.162s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/30814.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/30815.jpg
+./images/30815.jpg
+troubleshooting
+images/30815.jpg
+Detection took 0.158s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/30815.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/30816.jpg
+./images/30816.jpg
+troubleshooting
+images/30816.jpg
+Detection took 0.108s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/30816.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/31320.jpg
+./images/31320.jpg
+troubleshooting
+images/31320.jpg
+Detection took 0.124s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/31320.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/31321.jpg
+./images/31321.jpg
+troubleshooting
+images/31321.jpg
+Detection took 0.211s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/31321.xml
+31321.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/31552.jpg
+./images/31552.jpg
+troubleshooting
+images/31552.jpg
+Detection took 0.205s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/31552.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/31553.jpg
+./images/31553.jpg
+troubleshooting
+images/31553.jpg
+Detection took 0.172s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/31553.xml
+31553.jpg
+detections
+2
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/31555.jpg
+./images/31555.jpg
+troubleshooting
+images/31555.jpg
+Detection took 0.117s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/31555.xml
+31555.jpg
+detections
+2
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/31781.jpg
+./images/31781.jpg
+troubleshooting
+images/31781.jpg
+Detection took 0.152s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/31781.xml
+31781.jpg
+detections
+2
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/31783.jpg
+./images/31783.jpg
+troubleshooting
+images/31783.jpg
+Detection took 0.194s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/31783.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/31787.jpg
+./images/31787.jpg
+troubleshooting
+images/31787.jpg
+Detection took 0.169s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/31787.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/32099.jpg
+./images/32099.jpg
+troubleshooting
+images/32099.jpg
+Detection took 0.110s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/32099.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/32100.jpg
+./images/32100.jpg
+troubleshooting
+images/32100.jpg
+Detection took 0.193s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/32100.xml
+32100.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/32101.jpg
+./images/32101.jpg
+troubleshooting
+images/32101.jpg
+Detection took 0.118s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/32101.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/32102.jpg
+./images/32102.jpg
+troubleshooting
+images/32102.jpg
+Detection took 0.251s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/32102.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/32960.jpg
+./images/32960.jpg
+troubleshooting
+images/32960.jpg
+Detection took 0.127s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/32960.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/32963.jpg
+./images/32963.jpg
+troubleshooting
+images/32963.jpg
+Detection took 0.201s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/32963.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/33181.jpg
+./images/33181.jpg
+troubleshooting
+images/33181.jpg
+Detection took 0.161s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/33181.xml
+33181.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/33388.jpg
+./images/33388.jpg
+troubleshooting
+images/33388.jpg
+Detection took 0.199s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/33388.xml
+33388.jpg
+detections
+1
+roosts
+4
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/33623.jpg
+./images/33623.jpg
+troubleshooting
+images/33623.jpg
+Detection took 0.171s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/33623.xml
+33623.jpg
+detections
+1
+roosts
+6
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/33624.jpg
+./images/33624.jpg
+troubleshooting
+images/33624.jpg
+Detection took 0.164s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/33624.xml
+33624.jpg
+detections
+1
+roosts
+6
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/34125.jpg
+./images/34125.jpg
+troubleshooting
+images/34125.jpg
+Detection took 0.132s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/34125.xml
+34125.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/34127.jpg
+./images/34127.jpg
+troubleshooting
+images/34127.jpg
+Detection took 0.126s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/34127.xml
+34127.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/34128.jpg
+./images/34128.jpg
+troubleshooting
+images/34128.jpg
+Detection took 0.163s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/34128.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/34389.jpg
+./images/34389.jpg
+troubleshooting
+images/34389.jpg
+Detection took 0.135s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/34389.xml
+34389.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/34626.jpg
+./images/34626.jpg
+troubleshooting
+images/34626.jpg
+Detection took 0.138s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/34626.xml
+34626.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/34866.jpg
+./images/34866.jpg
+troubleshooting
+images/34866.jpg
+Detection took 0.185s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/34866.xml
+34866.jpg
+detections
+2
+roosts
+4
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/34869.jpg
+./images/34869.jpg
+troubleshooting
+images/34869.jpg
+Detection took 0.185s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/34869.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/35160.jpg
+./images/35160.jpg
+troubleshooting
+images/35160.jpg
+Detection took 0.131s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/35160.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/35162.jpg
+./images/35162.jpg
+troubleshooting
+images/35162.jpg
+Detection took 0.189s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/35162.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/35163.jpg
+./images/35163.jpg
+troubleshooting
+images/35163.jpg
+Detection took 0.202s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/35163.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/35166.jpg
+./images/35166.jpg
+troubleshooting
+images/35166.jpg
+Detection took 0.198s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/35166.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/35447.jpg
+./images/35447.jpg
+troubleshooting
+images/35447.jpg
+Detection took 0.195s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/35447.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/35448.jpg
+./images/35448.jpg
+troubleshooting
+images/35448.jpg
+Detection took 0.185s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/35448.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/35449.jpg
+./images/35449.jpg
+troubleshooting
+images/35449.jpg
+Detection took 0.225s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/35449.xml
+35449.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/35718.jpg
+./images/35718.jpg
+troubleshooting
+images/35718.jpg
+Detection took 0.207s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/35718.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/35720.jpg
+./images/35720.jpg
+troubleshooting
+images/35720.jpg
+Detection took 0.160s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/35720.xml
+35720.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/35722.jpg
+./images/35722.jpg
+troubleshooting
+images/35722.jpg
+Detection took 0.148s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/35722.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/102836.jpg
+./images/102836.jpg
+troubleshooting
+images/102836.jpg
+Detection took 0.226s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/102836.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/102838.jpg
+./images/102838.jpg
+troubleshooting
+images/102838.jpg
+Detection took 0.118s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/102838.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/102840.jpg
+./images/102840.jpg
+troubleshooting
+images/102840.jpg
+Detection took 0.198s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/102840.xml
+102840.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/102844.jpg
+./images/102844.jpg
+troubleshooting
+images/102844.jpg
+Detection took 0.190s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/102844.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/103308.jpg
+./images/103308.jpg
+troubleshooting
+images/103308.jpg
+Detection took 0.164s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/103308.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/103311.jpg
+./images/103311.jpg
+troubleshooting
+images/103311.jpg
+Detection took 0.178s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/103311.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/103314.jpg
+./images/103314.jpg
+troubleshooting
+images/103314.jpg
+Detection took 0.165s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/103314.xml
+103314.jpg
+detections
+1
+roosts
+4
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/103316.jpg
+./images/103316.jpg
+troubleshooting
+images/103316.jpg
+Detection took 0.191s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/103316.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/103320.jpg
+./images/103320.jpg
+troubleshooting
+images/103320.jpg
+Detection took 0.119s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/103320.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/103321.jpg
+./images/103321.jpg
+troubleshooting
+images/103321.jpg
+Detection took 0.176s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/103321.xml
+103321.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/104768.jpg
+./images/104768.jpg
+troubleshooting
+images/104768.jpg
+Detection took 0.245s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/104768.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/104771.jpg
+./images/104771.jpg
+troubleshooting
+images/104771.jpg
+Detection took 0.155s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/104771.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/104772.jpg
+./images/104772.jpg
+troubleshooting
+images/104772.jpg
+Detection took 0.201s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/104772.xml
+104772.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/104774.jpg
+./images/104774.jpg
+troubleshooting
+images/104774.jpg
+Detection took 0.153s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/104774.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/105033.jpg
+./images/105033.jpg
+troubleshooting
+images/105033.jpg
+Detection took 0.223s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/105033.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/105034.jpg
+./images/105034.jpg
+troubleshooting
+images/105034.jpg
+Detection took 0.193s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/105034.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/106205.jpg
+./images/106205.jpg
+troubleshooting
+images/106205.jpg
+Detection took 0.199s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/106205.xml
+106205.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/106208.jpg
+./images/106208.jpg
+troubleshooting
+images/106208.jpg
+Detection took 0.152s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/106208.xml
+106208.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/108179.jpg
+./images/108179.jpg
+troubleshooting
+images/108179.jpg
+Detection took 0.117s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/108179.xml
+108179.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/108181.jpg
+./images/108181.jpg
+troubleshooting
+images/108181.jpg
+Detection took 0.141s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/108181.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/108894.jpg
+./images/108894.jpg
+troubleshooting
+images/108894.jpg
+Detection took 0.218s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/108894.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/108896.jpg
+./images/108896.jpg
+troubleshooting
+images/108896.jpg
+Detection took 0.124s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/108896.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/109308.jpg
+./images/109308.jpg
+troubleshooting
+images/109308.jpg
+Detection took 0.219s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/109308.xml
+109308.jpg
+detections
+1
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/109757.jpg
+./images/109757.jpg
+troubleshooting
+images/109757.jpg
+Detection took 0.205s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/109757.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/109758.jpg
+./images/109758.jpg
+troubleshooting
+images/109758.jpg
+Detection took 0.134s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/109758.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/110548.jpg
+./images/110548.jpg
+troubleshooting
+images/110548.jpg
+Detection took 0.161s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/110548.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/110549.jpg
+./images/110549.jpg
+troubleshooting
+images/110549.jpg
+Detection took 0.248s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/110549.xml
+110549.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/110550.jpg
+./images/110550.jpg
+troubleshooting
+images/110550.jpg
+Detection took 0.280s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/110550.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/110551.jpg
+./images/110551.jpg
+troubleshooting
+images/110551.jpg
+Detection took 0.171s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/110551.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/110552.jpg
+./images/110552.jpg
+troubleshooting
+images/110552.jpg
+Detection took 0.209s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/110552.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/111913.jpg
+./images/111913.jpg
+troubleshooting
+images/111913.jpg
+Detection took 0.111s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/111913.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/111916.jpg
+./images/111916.jpg
+troubleshooting
+images/111916.jpg
+Detection took 0.230s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/111916.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/111917.jpg
+./images/111917.jpg
+troubleshooting
+images/111917.jpg
+Detection took 0.148s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/111917.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/112312.jpg
+./images/112312.jpg
+troubleshooting
+images/112312.jpg
+Detection took 0.193s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/112312.xml
+112312.jpg
+detections
+1
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/112313.jpg
+./images/112313.jpg
+troubleshooting
+images/112313.jpg
+Detection took 0.196s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/112313.xml
+112313.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/112316.jpg
+./images/112316.jpg
+troubleshooting
+images/112316.jpg
+Detection took 0.191s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/112316.xml
+112316.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/112317.jpg
+./images/112317.jpg
+troubleshooting
+images/112317.jpg
+Detection took 0.258s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/112317.xml
+112317.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/113083.jpg
+./images/113083.jpg
+troubleshooting
+images/113083.jpg
+Detection took 0.143s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/113083.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/113084.jpg
+./images/113084.jpg
+troubleshooting
+images/113084.jpg
+Detection took 0.179s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/113084.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/158776.jpg
+./images/158776.jpg
+troubleshooting
+images/158776.jpg
+Detection took 0.239s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/158776.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/160692.jpg
+./images/160692.jpg
+troubleshooting
+images/160692.jpg
+Detection took 0.116s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/160692.xml
+160692.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/160722.jpg
+./images/160722.jpg
+troubleshooting
+images/160722.jpg
+Detection took 0.147s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/160722.xml
+160722.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/160723.jpg
+./images/160723.jpg
+troubleshooting
+images/160723.jpg
+Detection took 0.140s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/160723.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/160724.jpg
+./images/160724.jpg
+troubleshooting
+images/160724.jpg
+Detection took 0.141s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/160724.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/160725.jpg
+./images/160725.jpg
+troubleshooting
+images/160725.jpg
+Detection took 0.184s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/160725.xml
+160725.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/160797.jpg
+./images/160797.jpg
+troubleshooting
+images/160797.jpg
+Detection took 0.162s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/160797.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/160799.jpg
+./images/160799.jpg
+troubleshooting
+images/160799.jpg
+Detection took 0.176s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/160799.xml
+160799.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/160817.jpg
+./images/160817.jpg
+troubleshooting
+images/160817.jpg
+Detection took 0.173s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/160817.xml
+160817.jpg
+detections
+2
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/160818.jpg
+./images/160818.jpg
+troubleshooting
+images/160818.jpg
+Detection took 0.180s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/160818.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/160821.jpg
+./images/160821.jpg
+troubleshooting
+images/160821.jpg
+Detection took 0.182s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/160821.xml
+160821.jpg
+detections
+2
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/160823.jpg
+./images/160823.jpg
+troubleshooting
+images/160823.jpg
+Detection took 0.117s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/160823.xml
+160823.jpg
+detections
+2
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/160830.jpg
+./images/160830.jpg
+troubleshooting
+images/160830.jpg
+Detection took 0.137s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/160830.xml
+160830.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/160831.jpg
+./images/160831.jpg
+troubleshooting
+images/160831.jpg
+Detection took 0.154s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/160831.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/160902.jpg
+./images/160902.jpg
+troubleshooting
+images/160902.jpg
+Detection took 0.185s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/160902.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/160903.jpg
+./images/160903.jpg
+troubleshooting
+images/160903.jpg
+Detection took 0.161s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/160903.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/160979.jpg
+./images/160979.jpg
+troubleshooting
+images/160979.jpg
+Detection took 0.203s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/160979.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161010.jpg
+./images/161010.jpg
+troubleshooting
+images/161010.jpg
+Detection took 0.185s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161010.xml
+161010.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161061.jpg
+./images/161061.jpg
+troubleshooting
+images/161061.jpg
+Detection took 0.153s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161061.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161101.jpg
+./images/161101.jpg
+troubleshooting
+images/161101.jpg
+Detection took 0.199s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161101.xml
+161101.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161102.jpg
+./images/161102.jpg
+troubleshooting
+images/161102.jpg
+Detection took 0.111s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161102.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161116.jpg
+./images/161116.jpg
+troubleshooting
+images/161116.jpg
+Detection took 0.217s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161116.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161121.jpg
+./images/161121.jpg
+troubleshooting
+images/161121.jpg
+Detection took 0.145s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161121.xml
+161121.jpg
+detections
+3
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161171.jpg
+./images/161171.jpg
+troubleshooting
+images/161171.jpg
+Detection took 0.172s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161171.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161205.jpg
+./images/161205.jpg
+troubleshooting
+images/161205.jpg
+Detection took 0.222s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161205.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161227.jpg
+./images/161227.jpg
+troubleshooting
+images/161227.jpg
+Detection took 0.162s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161227.xml
+161227.jpg
+detections
+2
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161261.jpg
+./images/161261.jpg
+troubleshooting
+images/161261.jpg
+Detection took 0.192s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161261.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161347.jpg
+./images/161347.jpg
+troubleshooting
+images/161347.jpg
+Detection took 0.194s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161347.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161348.jpg
+./images/161348.jpg
+troubleshooting
+images/161348.jpg
+Detection took 0.171s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161348.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161349.jpg
+./images/161349.jpg
+troubleshooting
+images/161349.jpg
+Detection took 0.117s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161349.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161384.jpg
+./images/161384.jpg
+troubleshooting
+images/161384.jpg
+Detection took 0.168s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161384.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161390.jpg
+./images/161390.jpg
+troubleshooting
+images/161390.jpg
+Detection took 0.166s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161390.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161391.jpg
+./images/161391.jpg
+troubleshooting
+images/161391.jpg
+Detection took 0.153s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161391.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161473.jpg
+./images/161473.jpg
+troubleshooting
+images/161473.jpg
+Detection took 0.161s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161473.xml
+161473.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161474.jpg
+./images/161474.jpg
+troubleshooting
+images/161474.jpg
+Detection took 0.165s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161474.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161527.jpg
+./images/161527.jpg
+troubleshooting
+images/161527.jpg
+Detection took 0.152s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161527.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161860.jpg
+./images/161860.jpg
+troubleshooting
+images/161860.jpg
+Detection took 0.279s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161860.xml
+161860.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161868.jpg
+./images/161868.jpg
+troubleshooting
+images/161868.jpg
+Detection took 0.235s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161868.xml
+161868.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/161873.jpg
+./images/161873.jpg
+troubleshooting
+images/161873.jpg
+Detection took 0.255s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/161873.xml
+161873.jpg
+detections
+2
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/162142.jpg
+./images/162142.jpg
+troubleshooting
+images/162142.jpg
+Detection took 0.243s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/162142.xml
+162142.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/162152.jpg
+./images/162152.jpg
+troubleshooting
+images/162152.jpg
+Detection took 0.206s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/162152.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/162157.jpg
+./images/162157.jpg
+troubleshooting
+images/162157.jpg
+Detection took 0.124s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/162157.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/162180.jpg
+./images/162180.jpg
+troubleshooting
+images/162180.jpg
+Detection took 0.181s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/162180.xml
+162180.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/162276.jpg
+./images/162276.jpg
+troubleshooting
+images/162276.jpg
+Detection took 0.175s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/162276.xml
+162276.jpg
+detections
+2
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/162282.jpg
+./images/162282.jpg
+troubleshooting
+images/162282.jpg
+Detection took 0.138s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/162282.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/165098.jpg
+./images/165098.jpg
+troubleshooting
+images/165098.jpg
+Detection took 0.207s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/165098.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/165099.jpg
+./images/165099.jpg
+troubleshooting
+images/165099.jpg
+Detection took 0.142s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/165099.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/169371.jpg
+./images/169371.jpg
+troubleshooting
+images/169371.jpg
+Detection took 0.205s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/169371.xml
+169371.jpg
+detections
+2
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/169629.jpg
+./images/169629.jpg
+troubleshooting
+images/169629.jpg
+Detection took 0.194s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/169629.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/169630.jpg
+./images/169630.jpg
+troubleshooting
+images/169630.jpg
+Detection took 0.170s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/169630.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/173464.jpg
+./images/173464.jpg
+troubleshooting
+images/173464.jpg
+Detection took 0.149s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/173464.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/173465.jpg
+./images/173465.jpg
+troubleshooting
+images/173465.jpg
+Detection took 0.203s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/173465.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/175125.jpg
+./images/175125.jpg
+troubleshooting
+images/175125.jpg
+Detection took 0.140s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/175125.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/175991.jpg
+./images/175991.jpg
+troubleshooting
+images/175991.jpg
+Detection took 0.190s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/175991.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/175993.jpg
+./images/175993.jpg
+troubleshooting
+images/175993.jpg
+Detection took 0.187s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/175993.xml
+175993.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/177238.jpg
+./images/177238.jpg
+troubleshooting
+images/177238.jpg
+Detection took 0.187s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/177238.xml
+177238.jpg
+detections
+3
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/177240.jpg
+./images/177240.jpg
+troubleshooting
+images/177240.jpg
+Detection took 0.191s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/177240.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/178354.jpg
+./images/178354.jpg
+troubleshooting
+images/178354.jpg
+Detection took 0.199s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/178354.xml
+178354.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/184779.jpg
+./images/184779.jpg
+troubleshooting
+images/184779.jpg
+Detection took 0.154s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/184779.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/207231.jpg
+./images/207231.jpg
+troubleshooting
+images/207231.jpg
+Detection took 0.212s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/207231.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/231610.jpg
+./images/231610.jpg
+troubleshooting
+images/231610.jpg
+Detection took 0.170s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/231610.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/231611.jpg
+./images/231611.jpg
+troubleshooting
+images/231611.jpg
+Detection took 0.279s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/231611.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/231612.jpg
+./images/231612.jpg
+troubleshooting
+images/231612.jpg
+Detection took 0.131s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/231612.xml
+231612.jpg
+detections
+2
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/240780.jpg
+./images/240780.jpg
+troubleshooting
+images/240780.jpg
+Detection took 0.192s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/240780.xml
+240780.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/240893.jpg
+./images/240893.jpg
+troubleshooting
+images/240893.jpg
+DeteroostDemo.py:71: RuntimeWarning: overflow encountered in ushort_scalars
+  ax.add_patch(plt.Rectangle((boxes[ix,0],boxes[ix,1]),boxes[ix,2]-boxes[ix,0],boxes[ix,3]-boxes[ix,1], fill=False, edgecolor='yellow',linewidth=3.5))
+ction took 0.163s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/240893.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/240895.jpg
+./images/240895.jpg
+troubleshooting
+images/240895.jpg
+Detection took 0.134s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/240895.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/240897.jpg
+./images/240897.jpg
+troubleshooting
+images/240897.jpg
+Detection took 0.196s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/240897.xml
+240897.jpg
+detections
+2
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/240986.jpg
+./images/240986.jpg
+troubleshooting
+images/240986.jpg
+Detection took 0.248s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/240986.xml
+240986.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/240988.jpg
+./images/240988.jpg
+troubleshooting
+images/240988.jpg
+Detection took 0.213s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/240988.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241017.jpg
+./images/241017.jpg
+troubleshooting
+images/241017.jpg
+Detection took 0.164s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241017.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241019.jpg
+./images/241019.jpg
+troubleshooting
+images/241019.jpg
+Detection took 0.150s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241019.xml
+241019.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241025.jpg
+./images/241025.jpg
+troubleshooting
+images/241025.jpg
+Detection took 0.132s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241025.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241026.jpg
+./images/241026.jpg
+troubleshooting
+images/241026.jpg
+Detection took 0.183s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241026.xml
+241026.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241027.jpg
+./images/241027.jpg
+troubleshooting
+images/241027.jpg
+Detection took 0.192s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241027.xml
+241027.jpg
+detections
+5
+roosts
+3
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241028.jpg
+./images/241028.jpg
+troubleshooting
+images/241028.jpg
+Detection took 0.182s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241028.xml
+241028.jpg
+detections
+2
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241029.jpg
+./images/241029.jpg
+troubleshooting
+images/241029.jpg
+Detection took 0.152s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241029.xml
+241029.jpg
+detections
+3
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241030.jpg
+./images/241030.jpg
+troubleshooting
+images/241030.jpg
+Detection took 0.108s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241030.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241060.jpg
+./images/241060.jpg
+troubleshooting
+images/241060.jpg
+Detection took 0.187s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241060.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241061.jpg
+./images/241061.jpg
+troubleshooting
+images/241061.jpg
+Detection took 0.164s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241061.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241064.jpg
+./images/241064.jpg
+troubleshooting
+images/241064.jpg
+Detection took 0.209s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241064.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241065.jpg
+./images/241065.jpg
+troubleshooting
+images/241065.jpg
+Detection took 0.178s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241065.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241067.jpg
+./images/241067.jpg
+troubleshooting
+images/241067.jpg
+Detection took 0.178s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241067.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241088.jpg
+./images/241088.jpg
+troubleshooting
+images/241088.jpg
+Detection took 0.201s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241088.xml
+241088.jpg
+detections
+3
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241089.jpg
+./images/241089.jpg
+troubleshooting
+images/241089.jpg
+Detection took 0.131s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241089.xml
+241089.jpg
+detections
+3
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241123.jpg
+./images/241123.jpg
+troubleshooting
+images/241123.jpg
+Detection took 0.154s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241123.xml
+241123.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241144.jpg
+./images/241144.jpg
+troubleshooting
+images/241144.jpg
+Detection took 0.189s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241144.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241146.jpg
+./images/241146.jpg
+troubleshooting
+images/241146.jpg
+Detection took 0.124s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241146.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241203.jpg
+./images/241203.jpg
+troubleshooting
+images/241203.jpg
+Detection took 0.198s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241203.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/241204.jpg
+./images/241204.jpg
+troubleshooting
+images/241204.jpg
+Detection took 0.138s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/241204.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/297436.jpg
+./images/297436.jpg
+troubleshooting
+images/297436.jpg
+Detection took 0.108s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/297436.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/297438.jpg
+./images/297438.jpg
+troubleshooting
+images/297438.jpg
+Detection took 0.238s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/297438.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/297439.jpg
+./images/297439.jpg
+troubleshooting
+images/297439.jpg
+Detection took 0.133s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/297439.xml
+297439.jpg
+detections
+3
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/297443.jpg
+./images/297443.jpg
+troubleshooting
+images/297443.jpg
+Detection took 0.140s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/297443.xml
+297443.jpg
+detections
+4
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/348822.jpg
+./images/348822.jpg
+troubleshooting
+images/348822.jpg
+Detection took 0.166s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/348822.xml
+348822.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/348824.jpg
+./images/348824.jpg
+troubleshooting
+images/348824.jpg
+Detection took 0.184s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/348824.xml
+348824.jpg
+detections
+3
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/348825.jpg
+./images/348825.jpg
+troubleshooting
+images/348825.jpg
+Detection took 0.173s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/348825.xml
+348825.jpg
+detections
+2
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/350063.jpg
+./images/350063.jpg
+troubleshooting
+images/350063.jpg
+Detection took 0.205s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/350063.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/432954.jpg
+./images/432954.jpg
+troubleshooting
+images/432954.jpg
+Detection took 0.177s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/432954.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/432955.jpg
+./images/432955.jpg
+troubleshooting
+images/432955.jpg
+Detection took 0.180s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/432955.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/432957.jpg
+./images/432957.jpg
+troubleshooting
+images/432957.jpg
+Detection took 0.157s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/432957.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/574067.jpg
+./images/574067.jpg
+troubleshooting
+images/574067.jpg
+Detection took 0.127s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/574067.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/574068.jpg
+./images/574068.jpg
+troubleshooting
+images/574068.jpg
+Detection took 0.195s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/574068.xml
+574068.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/574070.jpg
+./images/574070.jpg
+troubleshooting
+images/574070.jpg
+Detection took 0.142s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/574070.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/631676.jpg
+./images/631676.jpg
+troubleshooting
+images/631676.jpg
+Detection took 0.161s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/631676.xml
+631676.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/681991.jpg
+./images/681991.jpg
+troubleshooting
+images/681991.jpg
+Detection took 0.167s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/681991.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/681993.jpg
+./images/681993.jpg
+troubleshooting
+images/681993.jpg
+Detection took 0.197s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/681993.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/701019.jpg
+./images/701019.jpg
+troubleshooting
+images/701019.jpg
+Detection took 0.170s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/701019.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/701020.jpg
+./images/701020.jpg
+troubleshooting
+images/701020.jpg
+Detection took 0.191s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/701020.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/701021.jpg
+./images/701021.jpg
+troubleshooting
+images/701021.jpg
+Detection took 0.115s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/701021.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/701027.jpg
+./images/701027.jpg
+troubleshooting
+images/701027.jpg
+Detection took 0.158s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/701027.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/701028.jpg
+./images/701028.jpg
+troubleshooting
+images/701028.jpg
+Detection took 0.161s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/701028.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/701555.jpg
+./images/701555.jpg
+troubleshooting
+images/701555.jpg
+Detection took 0.114s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/701555.xml
+701555.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/701556.jpg
+./images/701556.jpg
+troubleshooting
+images/701556.jpg
+Detection took 0.111s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/701556.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/701557.jpg
+./images/701557.jpg
+troubleshooting
+images/701557.jpg
+Detection took 0.143s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/701557.xml
+701557.jpg
+detections
+1
+roosts
+4
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/701560.jpg
+./images/701560.jpg
+troubleshooting
+images/701560.jpg
+Detection took 0.121s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/701560.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/701561.jpg
+./images/701561.jpg
+troubleshooting
+images/701561.jpg
+Detection took 0.150s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/701561.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/702074.jpg
+./images/702074.jpg
+troubleshooting
+images/702074.jpg
+Detection took 0.154s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/702074.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/702078.jpg
+./images/702078.jpg
+troubleshooting
+images/702078.jpg
+Detection took 0.160s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/702078.xml
+702078.jpg
+detections
+3
+roosts
+3
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/702081.jpg
+./images/702081.jpg
+troubleshooting
+images/702081.jpg
+Detection took 0.161s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/702081.xml
+702081.jpg
+detections
+1
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/702083.jpg
+./images/702083.jpg
+troubleshooting
+images/702083.jpg
+Detection took 0.201s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/702083.xml
+702083.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/702084.jpg
+./images/702084.jpg
+troubleshooting
+images/702084.jpg
+Detection took 0.158s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/702084.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/702085.jpg
+./images/702085.jpg
+troubleshooting
+images/702085.jpg
+Detection took 0.120s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/702085.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/702562.jpg
+./images/702562.jpg
+troubleshooting
+images/702562.jpg
+Detection took 0.205s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/702562.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/703037.jpg
+./images/703037.jpg
+troubleshooting
+images/703037.jpg
+Detection took 0.160s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/703037.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/703038.jpg
+./images/703038.jpg
+troubleshooting
+images/703038.jpg
+Detection took 0.168s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/703038.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/703039.jpg
+./images/703039.jpg
+troubleshooting
+images/703039.jpg
+Detection took 0.179s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/703039.xml
+703039.jpg
+detections
+2
+roosts
+4
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/703040.jpg
+./images/703040.jpg
+troubleshooting
+images/703040.jpg
+Detection took 0.181s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/703040.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/703041.jpg
+./images/703041.jpg
+troubleshooting
+images/703041.jpg
+Detection took 0.110s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/703041.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/703044.jpg
+./images/703044.jpg
+troubleshooting
+images/703044.jpg
+Detection took 0.175s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/703044.xml
+703044.jpg
+detections
+2
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/703510.jpg
+./images/703510.jpg
+troubleshooting
+images/703510.jpg
+Detection took 0.154s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/703510.xml
+703510.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/703511.jpg
+./images/703511.jpg
+troubleshooting
+images/703511.jpg
+Detection took 0.176s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/703511.xml
+703511.jpg
+detections
+2
+roosts
+4
+True Positives
+2
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/703512.jpg
+./images/703512.jpg
+troubleshooting
+images/703512.jpg
+Detection took 0.120s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/703512.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/703997.jpg
+./images/703997.jpg
+troubleshooting
+images/703997.jpg
+Detection took 0.161s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/703997.xml
+703997.jpg
+detections
+2
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/703999.jpg
+./images/703999.jpg
+troubleshooting
+images/703999.jpg
+Detection took 0.161s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/703999.xml
+703999.jpg
+detections
+2
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/704559.jpg
+./images/704559.jpg
+troubleshooting
+images/704559.jpg
+Detection took 0.125s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/704559.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/704562.jpg
+./images/704562.jpg
+troubleshooting
+images/704562.jpg
+Detection took 0.247s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/704562.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/704563.jpg
+./images/704563.jpg
+troubleshooting
+images/704563.jpg
+Detection took 0.154s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/704563.xml
+704563.jpg
+detections
+1
+roosts
+4
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/704564.jpg
+./images/704564.jpg
+troubleshooting
+images/704564.jpg
+Detection took 0.128s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/704564.xml
+704564.jpg
+detections
+1
+roosts
+4
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/705218.jpg
+./images/705218.jpg
+troubleshooting
+images/705218.jpg
+Detection took 0.131s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/705218.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/705219.jpg
+./images/705219.jpg
+troubleshooting
+images/705219.jpg
+Detection took 0.152s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/705219.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/705220.jpg
+./images/705220.jpg
+troubleshooting
+images/705220.jpg
+Detection took 0.216s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/705220.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/705221.jpg
+./images/705221.jpg
+troubleshooting
+images/705221.jpg
+Detection took 0.183s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/705221.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/705223.jpg
+./images/705223.jpg
+troubleshooting
+images/705223.jpg
+Detection took 0.188s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/705223.xml
+705223.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/705224.jpg
+./images/705224.jpg
+troubleshooting
+images/705224.jpg
+Detection took 0.311s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/705224.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/705225.jpg
+./images/705225.jpg
+troubleshooting
+images/705225.jpg
+Detection took 0.130s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/705225.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/705228.jpg
+./images/705228.jpg
+troubleshooting
+images/705228.jpg
+Detection took 0.175s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/705228.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/705727.jpg
+./images/705727.jpg
+troubleshooting
+images/705727.jpg
+Detection took 0.184s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/705727.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/705732.jpg
+./images/705732.jpg
+troubleshooting
+images/705732.jpg
+Detection took 0.155s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/705732.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/705734.jpg
+./images/705734.jpg
+troubleshooting
+images/705734.jpg
+Detection took 0.198s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/705734.xml
+705734.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/706198.jpg
+./images/706198.jpg
+troubleshooting
+images/706198.jpg
+Detection took 0.198s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/706198.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/706199.jpg
+./images/706199.jpg
+troubleshooting
+images/706199.jpg
+Detection took 0.146s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/706199.xml
+706199.jpg
+detections
+1
+roosts
+4
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/706661.jpg
+./images/706661.jpg
+troubleshooting
+images/706661.jpg
+Detection took 0.125s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/706661.xml
+706661.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/706662.jpg
+./images/706662.jpg
+troubleshooting
+images/706662.jpg
+Detection took 0.152s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/706662.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/706663.jpg
+./images/706663.jpg
+troubleshooting
+images/706663.jpg
+Detection took 0.143s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/706663.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/707183.jpg
+./images/707183.jpg
+troubleshooting
+images/707183.jpg
+Detection took 0.198s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/707183.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/707185.jpg
+./images/707185.jpg
+troubleshooting
+images/707185.jpg
+Detection took 0.166s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/707185.xml
+707185.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/707745.jpg
+./images/707745.jpg
+troubleshooting
+images/707745.jpg
+Detection took 0.147s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/707745.xml
+707745.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/707747.jpg
+./images/707747.jpg
+troubleshooting
+images/707747.jpg
+Detection took 0.198s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/707747.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/707748.jpg
+./images/707748.jpg
+troubleshooting
+images/707748.jpg
+Detection took 0.179s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/707748.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/708266.jpg
+./images/708266.jpg
+troubleshooting
+images/708266.jpg
+Detection took 0.189s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/708266.xml
+708266.jpg
+detections
+3
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/708267.jpg
+./images/708267.jpg
+troubleshooting
+images/708267.jpg
+Detection took 0.134s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/708267.xml
+708267.jpg
+detections
+3
+roosts
+2
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/708269.jpg
+./images/708269.jpg
+troubleshooting
+images/708269.jpg
+Detection took 0.136s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/708269.xml
+708269.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/708270.jpg
+./images/708270.jpg
+troubleshooting
+images/708270.jpg
+Detection took 0.158s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/708270.xml
+708270.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/708696.jpg
+./images/708696.jpg
+troubleshooting
+images/708696.jpg
+Detection took 0.140s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/708696.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/708699.jpg
+./images/708699.jpg
+troubleshooting
+images/708699.jpg
+Detection took 0.238s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/708699.xml
+708699.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/708700.jpg
+./images/708700.jpg
+troubleshooting
+images/708700.jpg
+Detection took 0.201s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/708700.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/937486.jpg
+./images/937486.jpg
+troubleshooting
+images/937486.jpg
+Detection took 0.156s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/937486.xml
+937486.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/937487.jpg
+./images/937487.jpg
+troubleshooting
+images/937487.jpg
+Detection took 0.164s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/937487.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/941298.jpg
+./images/941298.jpg
+troubleshooting
+images/941298.jpg
+Detection took 0.190s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/941298.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/942024.jpg
+./images/942024.jpg
+troubleshooting
+images/942024.jpg
+Detection took 0.165s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/942024.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/942027.jpg
+./images/942027.jpg
+troubleshooting
+images/942027.jpg
+Detection took 0.117s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/942027.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/942028.jpg
+./images/942028.jpg
+troubleshooting
+images/942028.jpg
+Detection took 0.121s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/942028.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/942635.jpg
+./images/942635.jpg
+troubleshooting
+images/942635.jpg
+Detection took 0.229s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/942635.xml
+942635.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/942640.jpg
+./images/942640.jpg
+troubleshooting
+images/942640.jpg
+Detection took 0.150s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/942640.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/944202.jpg
+./images/944202.jpg
+troubleshooting
+images/944202.jpg
+Detection took 0.185s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/944202.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/944207.jpg
+./images/944207.jpg
+troubleshooting
+images/944207.jpg
+Detection took 0.165s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/944207.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/945005.jpg
+./images/945005.jpg
+troubleshooting
+images/945005.jpg
+Detection took 0.188s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/945005.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/945575.jpg
+./images/945575.jpg
+troubleshooting
+images/945575.jpg
+Detection took 0.174s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/945575.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/945576.jpg
+./images/945576.jpg
+troubleshooting
+images/945576.jpg
+Detection took 0.175s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/945576.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/945577.jpg
+./images/945577.jpg
+troubleshooting
+images/945577.jpg
+Detection took 0.263s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/945577.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/945578.jpg
+./images/945578.jpg
+troubleshooting
+images/945578.jpg
+Detection took 0.135s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/945578.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/946078.jpg
+./images/946078.jpg
+troubleshooting
+images/946078.jpg
+Detection took 0.184s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/946078.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/946571.jpg
+./images/946571.jpg
+troubleshooting
+images/946571.jpg
+Detection took 0.139s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/946571.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/947613.jpg
+./images/947613.jpg
+troubleshooting
+images/947613.jpg
+Detection took 0.216s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/947613.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/947615.jpg
+./images/947615.jpg
+troubleshooting
+images/947615.jpg
+Detection took 0.155s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/947615.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/948046.jpg
+./images/948046.jpg
+troubleshooting
+images/948046.jpg
+Detection took 0.205s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/948046.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/948047.jpg
+./images/948047.jpg
+troubleshooting
+images/948047.jpg
+Detection took 0.161s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/948047.xml
+948047.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/948471.jpg
+./images/948471.jpg
+troubleshooting
+images/948471.jpg
+Detection took 0.141s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/948471.xml
+948471.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/948472.jpg
+./images/948472.jpg
+troubleshooting
+images/948472.jpg
+Detection took 0.203s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/948472.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/948767.jpg
+./images/948767.jpg
+troubleshooting
+images/948767.jpg
+Detection took 0.179s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/948767.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/948769.jpg
+./images/948769.jpg
+troubleshooting
+images/948769.jpg
+Detection took 0.232s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/948769.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/949280.jpg
+./images/949280.jpg
+troubleshooting
+images/949280.jpg
+Detection took 0.163s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/949280.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/949281.jpg
+./images/949281.jpg
+troubleshooting
+images/949281.jpg
+Detection took 0.216s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/949281.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/949972.jpg
+./images/949972.jpg
+troubleshooting
+images/949972.jpg
+Detection took 0.167s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/949972.xml
+949972.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/949973.jpg
+./images/949973.jpg
+troubleshooting
+images/949973.jpg
+Detection took 0.132s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/949973.xml
+949973.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/949974.jpg
+./images/949974.jpg
+troubleshooting
+images/949974.jpg
+Detection took 0.130s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/949974.xml
+949974.jpg
+detections
+2
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/951047.jpg
+./images/951047.jpg
+troubleshooting
+images/951047.jpg
+Detection took 0.188s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/951047.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/952423.jpg
+./images/952423.jpg
+troubleshooting
+images/952423.jpg
+Detection took 0.158s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/952423.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/952424.jpg
+./images/952424.jpg
+troubleshooting
+images/952424.jpg
+Detection took 0.188s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/952424.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/952427.jpg
+./images/952427.jpg
+troubleshooting
+images/952427.jpg
+Detection took 0.134s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/952427.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1121971.jpg
+./images/1121971.jpg
+troubleshooting
+images/1121971.jpg
+Detection took 0.177s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1121971.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1121974.jpg
+./images/1121974.jpg
+troubleshooting
+images/1121974.jpg
+Detection took 0.212s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1121974.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1129249.jpg
+./images/1129249.jpg
+troubleshooting
+images/1129249.jpg
+Detection took 0.158s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1129249.xml
+1129249.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1135954.jpg
+./images/1135954.jpg
+troubleshooting
+images/1135954.jpg
+Detection took 0.122s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1135954.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1135955.jpg
+./images/1135955.jpg
+troubleshooting
+images/1135955.jpg
+Detection took 0.182s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1135955.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1135959.jpg
+./images/1135959.jpg
+troubleshooting
+images/1135959.jpg
+Detection took 0.155s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1135959.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1173761.jpg
+./images/1173761.jpg
+troubleshooting
+images/1173761.jpg
+Detection took 0.164s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1173761.xml
+1173761.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1173769.jpg
+./images/1173769.jpg
+troubleshooting
+images/1173769.jpg
+Detection took 0.190s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1173769.xml
+1173769.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1173781.jpg
+./images/1173781.jpg
+troubleshooting
+images/1173781.jpg
+Detection took 0.288s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1173781.xml
+1173781.jpg
+detections
+4
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1238860.jpg
+./images/1238860.jpg
+troubleshooting
+images/1238860.jpg
+Detection took 0.181s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1238860.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1238861.jpg
+./images/1238861.jpg
+troubleshooting
+images/1238861.jpg
+Detection took 0.166s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1238861.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1335415.jpg
+./images/1335415.jpg
+troubleshooting
+images/1335415.jpg
+Detection took 0.237s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1335415.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1335416.jpg
+./images/1335416.jpg
+troubleshooting
+images/1335416.jpg
+Detection took 0.151s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1335416.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1335420.jpg
+./images/1335420.jpg
+troubleshooting
+images/1335420.jpg
+Detection took 0.201s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1335420.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1335912.jpg
+./images/1335912.jpg
+troubleshooting
+images/1335912.jpg
+Detection took 0.123s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1335912.xml
+1335912.jpg
+detections
+2
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1335914.jpg
+./images/1335914.jpg
+troubleshooting
+images/1335914.jpg
+Detection took 0.202s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1335914.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1336392.jpg
+./images/1336392.jpg
+troubleshooting
+images/1336392.jpg
+Detection took 0.216s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1336392.xml
+1336392.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1336393.jpg
+./images/1336393.jpg
+troubleshooting
+images/1336393.jpg
+Detection took 0.292s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1336393.xml
+1336393.jpg
+detections
+1
+roosts
+10
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1336876.jpg
+./images/1336876.jpg
+troubleshooting
+images/1336876.jpg
+Detection took 0.171s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1336876.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1336880.jpg
+./images/1336880.jpg
+troubleshooting
+images/1336880.jpg
+Detection took 0.166s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1336880.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1337327.jpg
+./images/1337327.jpg
+troubleshooting
+images/1337327.jpg
+Detection took 0.162s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1337327.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1337328.jpg
+./images/1337328.jpg
+troubleshooting
+images/1337328.jpg
+Detection took 0.117s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1337328.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1337330.jpg
+./images/1337330.jpg
+troubleshooting
+images/1337330.jpg
+Detection took 0.111s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1337330.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1337821.jpg
+./images/1337821.jpg
+troubleshooting
+images/1337821.jpg
+Detection took 0.115s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1337821.xml
+1337821.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1337822.jpg
+./images/1337822.jpg
+troubleshooting
+images/1337822.jpg
+Detection took 0.172s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1337822.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1337826.jpg
+./images/1337826.jpg
+troubleshooting
+images/1337826.jpg
+Detection took 0.165s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1337826.xml
+1337826.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1338277.jpg
+./images/1338277.jpg
+troubleshooting
+images/1338277.jpg
+Detection took 0.166s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1338277.xml
+1338277.jpg
+detections
+3
+roosts
+4
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1338824.jpg
+./images/1338824.jpg
+troubleshooting
+images/1338824.jpg
+Detection took 0.117s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1338824.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1339163.jpg
+./images/1339163.jpg
+troubleshooting
+images/1339163.jpg
+Detection took 0.185s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1339163.xml
+1339163.jpg
+detections
+15
+roosts
+5
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1348218.jpg
+./images/1348218.jpg
+troubleshooting
+images/1348218.jpg
+Detection took 0.179s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1348218.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1348219.jpg
+./images/1348219.jpg
+troubleshooting
+images/1348219.jpg
+Detection took 0.144s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1348219.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1348631.jpg
+./images/1348631.jpg
+troubleshooting
+images/1348631.jpg
+Detection took 0.216s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1348631.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1349102.jpg
+./images/1349102.jpg
+troubleshooting
+images/1349102.jpg
+Detection took 0.131s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1349102.xml
+1349102.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1349596.jpg
+./images/1349596.jpg
+troubleshooting
+images/1349596.jpg
+Detection took 0.154s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1349596.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1349597.jpg
+./images/1349597.jpg
+troubleshooting
+images/1349597.jpg
+Detection took 0.221s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1349597.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1349598.jpg
+./images/1349598.jpg
+troubleshooting
+images/1349598.jpg
+Detection took 0.115s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1349598.xml
+1349598.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1349599.jpg
+./images/1349599.jpg
+troubleshooting
+images/1349599.jpg
+Detection took 0.229s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1349599.xml
+1349599.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1351052.jpg
+./images/1351052.jpg
+troubleshooting
+images/1351052.jpg
+Detection took 0.212s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1351052.xml
+1351052.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1351054.jpg
+./images/1351054.jpg
+troubleshooting
+images/1351054.jpg
+Detection took 0.157s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1351054.xml
+1351054.jpg
+detections
+2
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1351055.jpg
+./images/1351055.jpg
+troubleshooting
+images/1351055.jpg
+Detection took 0.203s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1351055.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1351473.jpg
+./images/1351473.jpg
+troubleshooting
+images/1351473.jpg
+Detection took 0.131s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1351473.xml
+1351473.jpg
+detections
+1
+roosts
+3
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1351477.jpg
+./images/1351477.jpg
+troubleshooting
+images/1351477.jpg
+Detection took 0.111s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1351477.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1351859.jpg
+./images/1351859.jpg
+troubleshooting
+images/1351859.jpg
+Detection took 0.120s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1351859.xml
+1351859.jpg
+detections
+1
+roosts
+2
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1351863.jpg
+./images/1351863.jpg
+troubleshooting
+images/1351863.jpg
+Detection took 0.148s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1351863.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1352374.jpg
+./images/1352374.jpg
+troubleshooting
+images/1352374.jpg
+Detection took 0.122s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1352374.xml
+1352374.jpg
+detections
+4
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1354822.jpg
+./images/1354822.jpg
+troubleshooting
+images/1354822.jpg
+Detection took 0.141s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1354822.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1354823.jpg
+./images/1354823.jpg
+troubleshooting
+images/1354823.jpg
+Detection took 0.172s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1354823.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1355760.jpg
+./images/1355760.jpg
+troubleshooting
+images/1355760.jpg
+Detection took 0.187s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1355760.xml
+1355760.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1357959.jpg
+./images/1357959.jpg
+troubleshooting
+images/1357959.jpg
+Detection took 0.199s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1357959.xml
+1357959.jpg
+detections
+1
+roosts
+1
+True Positives
+1
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1358427.jpg
+./images/1358427.jpg
+troubleshooting
+images/1358427.jpg
+Detection took 0.117s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1358427.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1358428.jpg
+./images/1358428.jpg
+troubleshooting
+images/1358428.jpg
+Detection took 0.209s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1358428.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1424422.jpg
+./images/1424422.jpg
+troubleshooting
+images/1424422.jpg
+Detection took 0.147s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1424422.xml
+1424422.jpg
+detections
+6
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1424423.jpg
+./images/1424423.jpg
+troubleshooting
+images/1424423.jpg
+Detection took 0.185s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1424423.xml
+1424423.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1436732.jpg
+./images/1436732.jpg
+troubleshooting
+images/1436732.jpg
+Detection took 0.163s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1436732.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1437181.jpg
+./images/1437181.jpg
+troubleshooting
+images/1437181.jpg
+Detection took 0.219s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1437181.xml
+1437181.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1437182.jpg
+./images/1437182.jpg
+troubleshooting
+images/1437182.jpg
+Detection took 0.148s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1437182.xml
+Nothing Detected
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1438728.jpg
+./images/1438728.jpg
+troubleshooting
+images/1438728.jpg
+Detection took 0.191s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1438728.xml
+1438728.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1438730.jpg
+./images/1438730.jpg
+troubleshooting
+images/1438730.jpg
+Detection took 0.140s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1438730.xml
+1438730.jpg
+detections
+1
+roosts
+1
+True Positives
+0
+DONE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Demo for data/demo/1440822.jpg
+./images/1440822.jpg
+troubleshooting
+images/1440822.jpg
+Detection took 0.122s for 300 object proposals
+/home/sgabriel/py-faster-rcnn/data/CNNData/Annotations/1440822.xml
+Nothing Detected
+DONE
+392
+1336
+97
+0.637755102041
+558

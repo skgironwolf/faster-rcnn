@@ -1,0 +1,1352 @@
++ set -e
++ export PYTHONUNBUFFERED=True
++ PYTHONUNBUFFERED=True
++ GPU_ID=1
++ NET=ZF
++ NET_lc=zf
++ DATASET=cnn_data
++ array=($@)
++ len=3
++ EXTRA_ARGS=
++ EXTRA_ARGS_SLUG=
++ case $DATASET in
++ TRAIN_IMDB=CNNDATA_train
++ TEST_IMDB=CNNDATA_test
++ PT_DIR=pascal_voc
++ ITERS=0
+++ date +%Y-%m-%d_%H-%M-%S
++ LOG=experiments/logs/faster_rcnn_end2end_ZF_.txt.2017-04-30_21-45-53
++ exec
+++ tee -a experiments/logs/faster_rcnn_end2end_ZF_.txt.2017-04-30_21-45-53
+tee: experiments/logs/faster_rcnn_end2end_ZF_.txt.2017-04-30_21-45-53: No such file or directory
++ echo Logging output to experiments/logs/faster_rcnn_end2end_ZF_.txt.2017-04-30_21-45-53
+Logging output to experiments/logs/faster_rcnn_end2end_ZF_.txt.2017-04-30_21-45-53
++ ../../tools/test_net.py --gpu 1 --def ../../models/pascal_voc/ZF/faster_rcnn_end2end/test.prototxt --net ../../output/default/voc_2007_train/oldModels/zf_faster_rcnn_iter_70000.caffemodel --imdb CNNDATA_test --cfg ../../experiments/cfgs/roost.yml
+<function <lambda> at 0x2aaad9d05ed8>
+<function <lambda> at 0x2aaad9d05f50>
+<function <lambda> at 0x2aaad9d0b050>
+<function <lambda> at 0x2aaad9d0b0c8>
+Called with args:
+Namespace(caffemodel='../../output/default/voc_2007_train/oldModels/zf_faster_rcnn_iter_70000.caffemodel', cfg_file='../../experiments/cfgs/roost.yml', comp_mode=False, gpu_id=1, imdb_name='CNNDATA_test', max_per_image=100, prototxt='../../models/pascal_voc/ZF/faster_rcnn_end2end/test.prototxt', set_cfgs=None, vis=False, wait=True)
+Using config:
+{'DATA_DIR': '/home/sgabriel/py-faster-rcnn/data',
+ 'DEDUP_BOXES': 0.0625,
+ 'EPS': 1e-14,
+ 'EXP_DIR': 'faster_rcnn_end2end',
+ 'GPU_ID': 1,
+ 'MATLAB': 'matlab',
+ 'MODELS_DIR': '/home/sgabriel/py-faster-rcnn/models/pascal_voc',
+ 'PIXEL_MEANS': array([[[ 102.9801,  115.9465,  122.7717]]]),
+ 'RNG_SEED': 17,
+ 'ROOT_DIR': '/home/sgabriel/py-faster-rcnn',
+ 'TEST': {'BBOX_REG': False,
+          'HAS_RPN': True,
+          'MAX_SIZE': 600,
+          'NMS': 0.3,
+          'PROPOSAL_METHOD': 'selective_search',
+          'RPN_MIN_SIZE': 16,
+          'RPN_NMS_THRESH': 0.7,
+          'RPN_POST_NMS_TOP_N': 300,
+          'RPN_PRE_NMS_TOP_N': 6000,
+          'SCALES': [600],
+          'SVM': False},
+ 'TRAIN': {'ASPECT_GROUPING': True,
+           'BATCH_SIZE': 4,
+           'BBOX_INSIDE_WEIGHTS': [1.0, 1.0, 1.0, 1.0],
+           'BBOX_NORMALIZE_MEANS': [0.0, 0.0, 0.0, 0.0],
+           'BBOX_NORMALIZE_STDS': [0.1, 0.1, 0.2, 0.2],
+           'BBOX_NORMALIZE_TARGETS': True,
+           'BBOX_NORMALIZE_TARGETS_PRECOMPUTED': True,
+           'BBOX_REG': False,
+           'BBOX_THRESH': 0.5,
+           'BG_THRESH_HI': 0.5,
+           'BG_THRESH_LO': 0.0,
+           'FG_FRACTION': 0.25,
+           'FG_THRESH': 0.5,
+           'HAS_RPN': True,
+           'IMS_PER_BATCH': 1,
+           'MAX_SIZE': 600,
+           'PROPOSAL_METHOD': 'gt',
+           'RPN_BATCHSIZE': 256,
+           'RPN_BBOX_INSIDE_WEIGHTS': [1.0, 1.0, 1.0, 1.0],
+           'RPN_CLOBBER_POSITIVES': False,
+           'RPN_FG_FRACTION': 0.5,
+           'RPN_MIN_SIZE': 16,
+           'RPN_NEGATIVE_OVERLAP': 0.3,
+           'RPN_NMS_THRESH': 0.7,
+           'RPN_POSITIVE_OVERLAP': 0.7,
+           'RPN_POSITIVE_WEIGHT': -1.0,
+           'RPN_POST_NMS_TOP_N': 2000,
+           'RPN_PRE_NMS_TOP_N': 12000,
+           'SCALES': [600],
+           'SNAPSHOT_INFIX': '',
+           'SNAPSHOT_ITERS': 10000,
+           'USE_FLIPPED': True,
+           'USE_PREFETCH': False},
+ 'USE_GPU_NMS': False}
+../../tools/test_net.py:80: RuntimeWarning: to-Python converter for boost::shared_ptr<caffe::Blob<float> > already registered; second conversion method ignored.
+  caffe.set_mode_gpu()
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0430 21:45:57.446372  9521 net.cpp:49] Initializing net from parameters: 
+name: "ZF"
+input: "data"
+input: "im_info"
+state {
+  phase: TEST
+}
+input_shape {
+  dim: 1
+  dim: 3
+  dim: 224
+  dim: 224
+}
+input_shape {
+  dim: 1
+  dim: 3
+}
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv1"
+  convolution_param {
+    num_output: 96
+    pad: 3
+    kernel_size: 7
+    stride: 2
+  }
+}
+layer {
+  name: "relu1"
+  type: "ReLU"
+  bottom: "conv1"
+  top: "conv1"
+}
+layer {
+  name: "norm1"
+  type: "LRN"
+  bottom: "conv1"
+  top: "norm1"
+  lrn_param {
+    local_size: 3
+    alpha: 5e-05
+    beta: 0.75
+    norm_region: WITHIN_CHANNEL
+    engine: CAFFE
+  }
+}
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "norm1"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+    pad: 1
+  }
+}
+layer {
+  name: "conv2"
+  type: "Convolution"
+  bottom: "pool1"
+  top: "conv2"
+  convolution_param {
+    num_output: 256
+    pad: 2
+    kernel_size: 5
+    stride: 2
+  }
+}
+layer {
+  name: "relu2"
+  type: "ReLU"
+  bottom: "conv2"
+  top: "conv2"
+}
+layer {
+  name: "norm2"
+  type: "LRN"
+  bottom: "conv2"
+  top: "norm2"
+  lrn_param {
+    local_size: 3
+    alpha: 5e-05
+    beta: 0.75
+    norm_region: WITHIN_CHANNEL
+    engine: CAFFE
+  }
+}
+layer {
+  name: "pool2"
+  type: "Pooling"
+  bottom: "norm2"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+    pad: 1
+  }
+}
+layer {
+  name: "conv3"
+  type: "Convolution"
+  bottom: "pool2"
+  top: "conv3"
+  convolution_param {
+    num_output: 384
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "relu3"
+  type: "ReLU"
+  bottom: "conv3"
+  top: "conv3"
+}
+layer {
+  name: "conv4"
+  type: "Convolution"
+  bottom: "conv3"
+  top: "conv4"
+  convolution_param {
+    num_output: 384
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "relu4"
+  type: "ReLU"
+  bottom: "conv4"
+  top: "conv4"
+}
+layer {
+  name: "conv5"
+  type: "Convolution"
+  bottom: "conv4"
+  top: "conv5"
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "relu5"
+  type: "ReLU"
+  bottom: "conv5"
+  top: "conv5"
+}
+layer {
+  name: "rpn_conv/3x3"
+  type: "Convolution"
+  bottom: "conv5"
+  top: "rpn/output"
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "rpn_relu/3x3"
+  type: "ReLU"
+  bottom: "rpn/output"
+  top: "rpn/output"
+}
+layer {
+  name: "rpn_cls_score"
+  type: "Convolution"
+  bottom: "rpn/output"
+  top: "rpn_cls_score"
+  convolution_param {
+    num_output: 18
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "rpn_bbox_pred"
+  type: "Convolution"
+  bottom: "rpn/output"
+  top: "rpn_bbox_pred"
+  convolution_param {
+    num_output: 36
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "rpn_cls_score_reshape"
+  type: "Reshape"
+  bottom: "rpn_cls_score"
+  top: "rpn_cls_score_reshape"
+  reshape_param {
+    shape {
+      dim: 0
+      dim: 2
+      dim: -1
+      dim: 0
+    }
+  }
+}
+layer {
+  name: "rpn_cls_prob"
+  type: "Softmax"
+  bottom: "rpn_cls_score_reshape"
+  top: "rpn_cls_prob"
+}
+layer {
+  name: "rpn_cls_prob_reshape"
+  type: "Reshape"
+  bottom: "rpn_cls_prob"
+  top: "rpn_cls_prob_reshape"
+  reshape_param {
+    shape {
+      dim: 0
+      dim: 18
+      dim: -1
+      dim: 0
+    }
+  }
+}
+layer {
+  name: "proposal"
+  type: "Python"
+  bottom: "rpn_cls_prob_reshape"
+  bottom: "rpn_bbox_pred"
+  bottom: "im_info"
+  top: "rois"
+  python_param {
+    module: "rpn.proposal_layer"
+    layer: "ProposalLayer"
+    param_str: "\'feat_stride\': 16"
+  }
+}
+layer {
+  name: "roi_pool_conv5"
+  type: "ROIPooling"
+  bottom: "conv5"
+  bottom: "rois"
+  top: "roi_pool_conv5"
+  roi_pooling_param {
+    pooled_h: 6
+    pooled_w: 6
+    spatial_scale: 0.0625
+  }
+}
+layer {
+  name: "fc6"
+  type: "InnerProduct"
+  bottom: "roi_pool_conv5"
+  top: "fc6"
+  inner_product_param {
+    num_output: 4096
+  }
+}
+layer {
+  name: "relu6"
+  type: "ReLU"
+  bottom: "fc6"
+  top: "fc6"
+}
+layer {
+  name: "drop6"
+  type: "Dropout"
+  bottom: "fc6"
+  top: "fc6"
+  dropout_param {
+    dropout_ratio: 0.5
+    scale_train: false
+  }
+}
+layer {
+  name: "fc7"
+  type: "InnerProduct"
+  bottom: "fc6"
+  top: "fc7"
+  inner_product_param {
+    num_output: 4096
+  }
+}
+layer {
+  name: "relu7"
+  type: "ReLU"
+  bottom: "fc7"
+  top: "fc7"
+}
+layer {
+  name: "drop7"
+  type: "Dropout"
+  bottom: "fc7"
+  top: "fc7"
+  dropout_param {
+    dropout_ratio: 0.5
+    scale_train: false
+  }
+}
+layer {
+  name: "cls_score"
+  type: "InnerProduct"
+  bottom: "fc7"
+  top: "cls_score"
+  inner_product_param {
+    num_output: 2
+  }
+}
+layer {
+  name: "bbox_pred"
+  type: "InnerProduct"
+  bottom: "fc7"
+  top: "bbox_pred"
+  inner_product_param {
+    num_output: 8
+  }
+}
+layer {
+  name: "cls_prob"
+  type: "Softmax"
+  bottom: "cls_score"
+  top: "cls_prob"
+  loss_param {
+    ignore_label: -1
+    normalize: true
+  }
+}
+I0430 21:45:57.446698  9521 net.cpp:413] Input 0 -> data
+I0430 21:45:57.488076  9521 net.cpp:413] Input 1 -> im_info
+I0430 21:45:57.488155  9521 layer_factory.hpp:77] Creating layer conv1
+I0430 21:45:57.488185  9521 net.cpp:106] Creating Layer conv1
+I0430 21:45:57.488193  9521 net.cpp:454] conv1 <- data
+I0430 21:45:57.488200  9521 net.cpp:411] conv1 -> conv1
+I0430 21:45:57.489481  9521 net.cpp:150] Setting up conv1
+I0430 21:45:57.489503  9521 net.cpp:157] Top shape: 1 96 112 112 (1204224)
+I0430 21:45:57.489507  9521 net.cpp:165] Memory required for data: 4816896
+I0430 21:45:57.489531  9521 layer_factory.hpp:77] Creating layer relu1
+I0430 21:45:57.489547  9521 net.cpp:106] Creating Layer relu1
+I0430 21:45:57.489552  9521 net.cpp:454] relu1 <- conv1
+I0430 21:45:57.489559  9521 net.cpp:397] relu1 -> conv1 (in-place)
+I0430 21:45:57.489574  9521 net.cpp:150] Setting up relu1
+I0430 21:45:57.489583  9521 net.cpp:157] Top shape: 1 96 112 112 (1204224)
+I0430 21:45:57.489588  9521 net.cpp:165] Memory required for data: 9633792
+I0430 21:45:57.489593  9521 layer_factory.hpp:77] Creating layer norm1
+I0430 21:45:57.489603  9521 net.cpp:106] Creating Layer norm1
+I0430 21:45:57.489608  9521 net.cpp:454] norm1 <- conv1
+I0430 21:45:57.489614  9521 net.cpp:411] norm1 -> norm1
+I0430 21:45:57.489765  9521 net.cpp:150] Setting up norm1
+I0430 21:45:57.489775  9521 net.cpp:157] Top shape: 1 96 112 112 (1204224)
+I0430 21:45:57.489780  9521 net.cpp:165] Memory required for data: 14450688
+I0430 21:45:57.489784  9521 layer_factory.hpp:77] Creating layer pool1
+I0430 21:45:57.489797  9521 net.cpp:106] Creating Layer pool1
+I0430 21:45:57.489802  9521 net.cpp:454] pool1 <- norm1
+I0430 21:45:57.489811  9521 net.cpp:411] pool1 -> pool1
+I0430 21:45:57.489859  9521 net.cpp:150] Setting up pool1
+I0430 21:45:57.489867  9521 net.cpp:157] Top shape: 1 96 57 57 (311904)
+I0430 21:45:57.489872  9521 net.cpp:165] Memory required for data: 15698304
+I0430 21:45:57.489876  9521 layer_factory.hpp:77] Creating layer conv2
+I0430 21:45:57.489887  9521 net.cpp:106] Creating Layer conv2
+I0430 21:45:57.489892  9521 net.cpp:454] conv2 <- pool1
+I0430 21:45:57.489898  9521 net.cpp:411] conv2 -> conv2
+I0430 21:45:57.493578  9521 net.cpp:150] Setting up conv2
+I0430 21:45:57.493595  9521 net.cpp:157] Top shape: 1 256 29 29 (215296)
+I0430 21:45:57.493600  9521 net.cpp:165] Memory required for data: 16559488
+I0430 21:45:57.493613  9521 layer_factory.hpp:77] Creating layer relu2
+I0430 21:45:57.493623  9521 net.cpp:106] Creating Layer relu2
+I0430 21:45:57.493628  9521 net.cpp:454] relu2 <- conv2
+I0430 21:45:57.493638  9521 net.cpp:397] relu2 -> conv2 (in-place)
+I0430 21:45:57.493649  9521 net.cpp:150] Setting up relu2
+I0430 21:45:57.493655  9521 net.cpp:157] Top shape: 1 256 29 29 (215296)
+I0430 21:45:57.493660  9521 net.cpp:165] Memory required for data: 17420672
+I0430 21:45:57.493664  9521 layer_factory.hpp:77] Creating layer norm2
+I0430 21:45:57.493672  9521 net.cpp:106] Creating Layer norm2
+I0430 21:45:57.493676  9521 net.cpp:454] norm2 <- conv2
+I0430 21:45:57.493685  9521 net.cpp:411] norm2 -> norm2
+I0430 21:45:57.493808  9521 net.cpp:150] Setting up norm2
+I0430 21:45:57.493818  9521 net.cpp:157] Top shape: 1 256 29 29 (215296)
+I0430 21:45:57.493823  9521 net.cpp:165] Memory required for data: 18281856
+I0430 21:45:57.493825  9521 layer_factory.hpp:77] Creating layer pool2
+I0430 21:45:57.493837  9521 net.cpp:106] Creating Layer pool2
+I0430 21:45:57.493842  9521 net.cpp:454] pool2 <- norm2
+I0430 21:45:57.493849  9521 net.cpp:411] pool2 -> pool2
+I0430 21:45:57.493892  9521 net.cpp:150] Setting up pool2
+I0430 21:45:57.493899  9521 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0430 21:45:57.493903  9521 net.cpp:165] Memory required for data: 18512256
+I0430 21:45:57.493908  9521 layer_factory.hpp:77] Creating layer conv3
+I0430 21:45:57.493921  9521 net.cpp:106] Creating Layer conv3
+I0430 21:45:57.493926  9521 net.cpp:454] conv3 <- pool2
+I0430 21:45:57.493930  9521 net.cpp:411] conv3 -> conv3
+I0430 21:45:57.497498  9521 net.cpp:150] Setting up conv3
+I0430 21:45:57.497514  9521 net.cpp:157] Top shape: 1 384 15 15 (86400)
+I0430 21:45:57.497519  9521 net.cpp:165] Memory required for data: 18857856
+I0430 21:45:57.497534  9521 layer_factory.hpp:77] Creating layer relu3
+I0430 21:45:57.497551  9521 net.cpp:106] Creating Layer relu3
+I0430 21:45:57.497557  9521 net.cpp:454] relu3 <- conv3
+I0430 21:45:57.497565  9521 net.cpp:397] relu3 -> conv3 (in-place)
+I0430 21:45:57.497573  9521 net.cpp:150] Setting up relu3
+I0430 21:45:57.497580  9521 net.cpp:157] Top shape: 1 384 15 15 (86400)
+I0430 21:45:57.497584  9521 net.cpp:165] Memory required for data: 19203456
+I0430 21:45:57.497588  9521 layer_factory.hpp:77] Creating layer conv4
+I0430 21:45:57.497601  9521 net.cpp:106] Creating Layer conv4
+I0430 21:45:57.497606  9521 net.cpp:454] conv4 <- conv3
+I0430 21:45:57.497612  9521 net.cpp:411] conv4 -> conv4
+I0430 21:45:57.502789  9521 net.cpp:150] Setting up conv4
+I0430 21:45:57.502804  9521 net.cpp:157] Top shape: 1 384 15 15 (86400)
+I0430 21:45:57.502809  9521 net.cpp:165] Memory required for data: 19549056
+I0430 21:45:57.502817  9521 layer_factory.hpp:77] Creating layer relu4
+I0430 21:45:57.502826  9521 net.cpp:106] Creating Layer relu4
+I0430 21:45:57.502832  9521 net.cpp:454] relu4 <- conv4
+I0430 21:45:57.502841  9521 net.cpp:397] relu4 -> conv4 (in-place)
+I0430 21:45:57.502849  9521 net.cpp:150] Setting up relu4
+I0430 21:45:57.502856  9521 net.cpp:157] Top shape: 1 384 15 15 (86400)
+I0430 21:45:57.502861  9521 net.cpp:165] Memory required for data: 19894656
+I0430 21:45:57.502864  9521 layer_factory.hpp:77] Creating layer conv5
+I0430 21:45:57.502873  9521 net.cpp:106] Creating Layer conv5
+I0430 21:45:57.502878  9521 net.cpp:454] conv5 <- conv4
+I0430 21:45:57.502887  9521 net.cpp:411] conv5 -> conv5
+I0430 21:45:57.506347  9521 net.cpp:150] Setting up conv5
+I0430 21:45:57.506361  9521 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0430 21:45:57.506366  9521 net.cpp:165] Memory required for data: 20125056
+I0430 21:45:57.506384  9521 layer_factory.hpp:77] Creating layer relu5
+I0430 21:45:57.506393  9521 net.cpp:106] Creating Layer relu5
+I0430 21:45:57.506398  9521 net.cpp:454] relu5 <- conv5
+I0430 21:45:57.506403  9521 net.cpp:397] relu5 -> conv5 (in-place)
+I0430 21:45:57.506412  9521 net.cpp:150] Setting up relu5
+I0430 21:45:57.506418  9521 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0430 21:45:57.506422  9521 net.cpp:165] Memory required for data: 20355456
+I0430 21:45:57.506425  9521 layer_factory.hpp:77] Creating layer conv5_relu5_0_split
+I0430 21:45:57.506441  9521 net.cpp:106] Creating Layer conv5_relu5_0_split
+I0430 21:45:57.506446  9521 net.cpp:454] conv5_relu5_0_split <- conv5
+I0430 21:45:57.506451  9521 net.cpp:411] conv5_relu5_0_split -> conv5_relu5_0_split_0
+I0430 21:45:57.506459  9521 net.cpp:411] conv5_relu5_0_split -> conv5_relu5_0_split_1
+I0430 21:45:57.506505  9521 net.cpp:150] Setting up conv5_relu5_0_split
+I0430 21:45:57.506513  9521 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0430 21:45:57.506521  9521 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0430 21:45:57.506525  9521 net.cpp:165] Memory required for data: 20816256
+I0430 21:45:57.506530  9521 layer_factory.hpp:77] Creating layer rpn_conv/3x3
+I0430 21:45:57.506543  9521 net.cpp:106] Creating Layer rpn_conv/3x3
+I0430 21:45:57.506549  9521 net.cpp:454] rpn_conv/3x3 <- conv5_relu5_0_split_0
+I0430 21:45:57.506556  9521 net.cpp:411] rpn_conv/3x3 -> rpn/output
+I0430 21:45:57.528882  9521 net.cpp:150] Setting up rpn_conv/3x3
+I0430 21:45:57.528928  9521 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0430 21:45:57.528934  9521 net.cpp:165] Memory required for data: 21046656
+I0430 21:45:57.528951  9521 layer_factory.hpp:77] Creating layer rpn_relu/3x3
+I0430 21:45:57.529048  9521 net.cpp:106] Creating Layer rpn_relu/3x3
+I0430 21:45:57.529060  9521 net.cpp:454] rpn_relu/3x3 <- rpn/output
+I0430 21:45:57.529074  9521 net.cpp:397] rpn_relu/3x3 -> rpn/output (in-place)
+I0430 21:45:57.529093  9521 net.cpp:150] Setting up rpn_relu/3x3
+I0430 21:45:57.529103  9521 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0430 21:45:57.529109  9521 net.cpp:165] Memory required for data: 21277056
+I0430 21:45:57.529114  9521 layer_factory.hpp:77] Creating layer rpn/output_rpn_relu/3x3_0_split
+I0430 21:45:57.529126  9521 net.cpp:106] Creating Layer rpn/output_rpn_relu/3x3_0_split
+I0430 21:45:57.529134  9521 net.cpp:454] rpn/output_rpn_relu/3x3_0_split <- rpn/output
+I0430 21:45:57.529147  9521 net.cpp:411] rpn/output_rpn_relu/3x3_0_split -> rpn/output_rpn_relu/3x3_0_split_0
+I0430 21:45:57.529160  9521 net.cpp:411] rpn/output_rpn_relu/3x3_0_split -> rpn/output_rpn_relu/3x3_0_split_1
+I0430 21:45:57.529227  9521 net.cpp:150] Setting up rpn/output_rpn_relu/3x3_0_split
+I0430 21:45:57.529243  9521 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0430 21:45:57.529253  9521 net.cpp:157] Top shape: 1 256 15 15 (57600)
+I0430 21:45:57.529258  9521 net.cpp:165] Memory required for data: 21737856
+I0430 21:45:57.529265  9521 layer_factory.hpp:77] Creating layer rpn_cls_score
+I0430 21:45:57.529289  9521 net.cpp:106] Creating Layer rpn_cls_score
+I0430 21:45:57.529295  9521 net.cpp:454] rpn_cls_score <- rpn/output_rpn_relu/3x3_0_split_0
+I0430 21:45:57.529307  9521 net.cpp:411] rpn_cls_score -> rpn_cls_score
+I0430 21:45:57.529875  9521 net.cpp:150] Setting up rpn_cls_score
+I0430 21:45:57.529891  9521 net.cpp:157] Top shape: 1 18 15 15 (4050)
+I0430 21:45:57.529896  9521 net.cpp:165] Memory required for data: 21754056
+I0430 21:45:57.529908  9521 layer_factory.hpp:77] Creating layer rpn_bbox_pred
+I0430 21:45:57.529927  9521 net.cpp:106] Creating Layer rpn_bbox_pred
+I0430 21:45:57.529933  9521 net.cpp:454] rpn_bbox_pred <- rpn/output_rpn_relu/3x3_0_split_1
+I0430 21:45:57.529947  9521 net.cpp:411] rpn_bbox_pred -> rpn_bbox_pred
+I0430 21:45:57.530586  9521 net.cpp:150] Setting up rpn_bbox_pred
+I0430 21:45:57.530601  9521 net.cpp:157] Top shape: 1 36 15 15 (8100)
+I0430 21:45:57.530607  9521 net.cpp:165] Memory required for data: 21786456
+I0430 21:45:57.530619  9521 layer_factory.hpp:77] Creating layer rpn_cls_score_reshape
+I0430 21:45:57.530642  9521 net.cpp:106] Creating Layer rpn_cls_score_reshape
+I0430 21:45:57.530648  9521 net.cpp:454] rpn_cls_score_reshape <- rpn_cls_score
+I0430 21:45:57.530659  9521 net.cpp:411] rpn_cls_score_reshape -> rpn_cls_score_reshape
+I0430 21:45:57.530714  9521 net.cpp:150] Setting up rpn_cls_score_reshape
+I0430 21:45:57.530725  9521 net.cpp:157] Top shape: 1 2 135 15 (4050)
+I0430 21:45:57.530730  9521 net.cpp:165] Memory required for data: 21802656
+I0430 21:45:57.530736  9521 layer_factory.hpp:77] Creating layer rpn_cls_prob
+I0430 21:45:57.530747  9521 net.cpp:106] Creating Layer rpn_cls_prob
+I0430 21:45:57.530755  9521 net.cpp:454] rpn_cls_prob <- rpn_cls_score_reshape
+I0430 21:45:57.530766  9521 net.cpp:411] rpn_cls_prob -> rpn_cls_prob
+I0430 21:45:57.530869  9521 net.cpp:150] Setting up rpn_cls_prob
+I0430 21:45:57.530877  9521 net.cpp:157] Top shape: 1 2 135 15 (4050)
+I0430 21:45:57.530884  9521 net.cpp:165] Memory required for data: 21818856
+I0430 21:45:57.530890  9521 layer_factory.hpp:77] Creating layer rpn_cls_prob_reshape
+I0430 21:45:57.530903  9521 net.cpp:106] Creating Layer rpn_cls_prob_reshape
+I0430 21:45:57.530910  9521 net.cpp:454] rpn_cls_prob_reshape <- rpn_cls_prob
+I0430 21:45:57.530920  9521 net.cpp:411] rpn_cls_prob_reshape -> rpn_cls_prob_reshape
+I0430 21:45:57.530956  9521 net.cpp:150] Setting up rpn_cls_prob_reshape
+I0430 21:45:57.530966  9521 net.cpp:157] Top shape: 1 18 15 15 (4050)
+I0430 21:45:57.530972  9521 net.cpp:165] Memory required for data: 21835056
+I0430 21:45:57.530977  9521 layer_factory.hpp:77] Creating layer proposal
+I0430 21:45:57.534368  9521 net.cpp:106] Creating Layer proposal
+I0430 21:45:57.534385  9521 net.cpp:454] proposal <- rpn_cls_prob_reshape
+I0430 21:45:57.534392  9521 net.cpp:454] proposal <- rpn_bbox_pred
+I0430 21:45:57.534399  9521 net.cpp:454] proposal <- im_info
+I0430 21:45:57.534405  9521 net.cpp:411] proposal -> rois
+I0430 21:45:57.535460  9521 net.cpp:150] Setting up proposal
+I0430 21:45:57.535476  9521 net.cpp:157] Top shape: 1 5 (5)
+I0430 21:45:57.535481  9521 net.cpp:165] Memory required for data: 21835076
+I0430 21:45:57.535485  9521 layer_factory.hpp:77] Creating layer roi_pool_conv5
+I0430 21:45:57.535501  9521 net.cpp:106] Creating Layer roi_pool_conv5
+I0430 21:45:57.535506  9521 net.cpp:454] roi_pool_conv5 <- conv5_relu5_0_split_1
+I0430 21:45:57.535513  9521 net.cpp:454] roi_pool_conv5 <- rois
+I0430 21:45:57.535521  9521 net.cpp:411] roi_pool_conv5 -> roi_pool_conv5
+I0430 21:45:57.535533  9521 roi_pooling_layer.cpp:30] Spatial scale: 0.0625
+I0430 21:45:57.535595  9521 net.cpp:150] Setting up roi_pool_conv5
+I0430 21:45:57.535603  9521 net.cpp:157] Top shape: 1 256 6 6 (9216)
+I0430 21:45:57.535609  9521 net.cpp:165] Memory required for data: 21871940
+I0430 21:45:57.535611  9521 layer_factory.hpp:77] Creating layer fc6
+I0430 21:45:57.535624  9521 net.cpp:106] Creating Layer fc6
+I0430 21:45:57.535629  9521 net.cpp:454] fc6 <- roi_pool_conv5
+I0430 21:45:57.535635  9521 net.cpp:411] fc6 -> fc6
+I0430 21:45:57.735239  9521 net.cpp:150] Setting up fc6
+I0430 21:45:57.735285  9521 net.cpp:157] Top shape: 1 4096 (4096)
+I0430 21:45:57.735290  9521 net.cpp:165] Memory required for data: 21888324
+I0430 21:45:57.735321  9521 layer_factory.hpp:77] Creating layer relu6
+I0430 21:45:57.735342  9521 net.cpp:106] Creating Layer relu6
+I0430 21:45:57.735349  9521 net.cpp:454] relu6 <- fc6
+I0430 21:45:57.735359  9521 net.cpp:397] relu6 -> fc6 (in-place)
+I0430 21:45:57.735373  9521 net.cpp:150] Setting up relu6
+I0430 21:45:57.735378  9521 net.cpp:157] Top shape: 1 4096 (4096)
+I0430 21:45:57.735380  9521 net.cpp:165] Memory required for data: 21904708
+I0430 21:45:57.735385  9521 layer_factory.hpp:77] Creating layer drop6
+I0430 21:45:57.735409  9521 net.cpp:106] Creating Layer drop6
+I0430 21:45:57.735412  9521 net.cpp:454] drop6 <- fc6
+I0430 21:45:57.735417  9521 net.cpp:397] drop6 -> fc6 (in-place)
+I0430 21:45:57.735448  9521 net.cpp:150] Setting up drop6
+I0430 21:45:57.735453  9521 net.cpp:157] Top shape: 1 4096 (4096)
+I0430 21:45:57.735456  9521 net.cpp:165] Memory required for data: 21921092
+I0430 21:45:57.735461  9521 layer_factory.hpp:77] Creating layer fc7
+I0430 21:45:57.735471  9521 net.cpp:106] Creating Layer fc7
+I0430 21:45:57.735476  9521 net.cpp:454] fc7 <- fc6
+I0430 21:45:57.735483  9521 net.cpp:411] fc7 -> fc7
+I0430 21:45:57.834580  9521 net.cpp:150] Setting up fc7
+I0430 21:45:57.834616  9521 net.cpp:157] Top shape: 1 4096 (4096)
+I0430 21:45:57.834620  9521 net.cpp:165] Memory required for data: 21937476
+I0430 21:45:57.834635  9521 layer_factory.hpp:77] Creating layer relu7
+I0430 21:45:57.834651  9521 net.cpp:106] Creating Layer relu7
+I0430 21:45:57.834657  9521 net.cpp:454] relu7 <- fc7
+I0430 21:45:57.834666  9521 net.cpp:397] relu7 -> fc7 (in-place)
+I0430 21:45:57.834677  9521 net.cpp:150] Setting up relu7
+I0430 21:45:57.834682  9521 net.cpp:157] Top shape: 1 4096 (4096)
+I0430 21:45:57.834686  9521 net.cpp:165] Memory required for data: 21953860
+I0430 21:45:57.834689  9521 layer_factory.hpp:77] Creating layer drop7
+I0430 21:45:57.834699  9521 net.cpp:106] Creating Layer drop7
+I0430 21:45:57.834702  9521 net.cpp:454] drop7 <- fc7
+I0430 21:45:57.834709  9521 net.cpp:397] drop7 -> fc7 (in-place)
+I0430 21:45:57.834733  9521 net.cpp:150] Setting up drop7
+I0430 21:45:57.834738  9521 net.cpp:157] Top shape: 1 4096 (4096)
+I0430 21:45:57.834744  9521 net.cpp:165] Memory required for data: 21970244
+I0430 21:45:57.834748  9521 layer_factory.hpp:77] Creating layer fc7_drop7_0_split
+I0430 21:45:57.834755  9521 net.cpp:106] Creating Layer fc7_drop7_0_split
+I0430 21:45:57.834759  9521 net.cpp:454] fc7_drop7_0_split <- fc7
+I0430 21:45:57.834765  9521 net.cpp:411] fc7_drop7_0_split -> fc7_drop7_0_split_0
+I0430 21:45:57.834772  9521 net.cpp:411] fc7_drop7_0_split -> fc7_drop7_0_split_1
+I0430 21:45:57.834817  9521 net.cpp:150] Setting up fc7_drop7_0_split
+I0430 21:45:57.834823  9521 net.cpp:157] Top shape: 1 4096 (4096)
+I0430 21:45:57.834827  9521 net.cpp:157] Top shape: 1 4096 (4096)
+I0430 21:45:57.834830  9521 net.cpp:165] Memory required for data: 22003012
+I0430 21:45:57.834834  9521 layer_factory.hpp:77] Creating layer cls_score
+I0430 21:45:57.834853  9521 net.cpp:106] Creating Layer cls_score
+I0430 21:45:57.834857  9521 net.cpp:454] cls_score <- fc7_drop7_0_split_0
+I0430 21:45:57.834863  9521 net.cpp:411] cls_score -> cls_score
+I0430 21:45:57.834977  9521 net.cpp:150] Setting up cls_score
+I0430 21:45:57.834983  9521 net.cpp:157] Top shape: 1 2 (2)
+I0430 21:45:57.834986  9521 net.cpp:165] Memory required for data: 22003020
+I0430 21:45:57.834992  9521 layer_factory.hpp:77] Creating layer bbox_pred
+I0430 21:45:57.834998  9521 net.cpp:106] Creating Layer bbox_pred
+I0430 21:45:57.835005  9521 net.cpp:454] bbox_pred <- fc7_drop7_0_split_1
+I0430 21:45:57.835011  9521 net.cpp:411] bbox_pred -> bbox_pred
+I0430 21:45:57.836213  9521 net.cpp:150] Setting up bbox_pred
+I0430 21:45:57.836225  9521 net.cpp:157] Top shape: 1 8 (8)
+I0430 21:45:57.836230  9521 net.cpp:165] Memory required for data: 22003052
+I0430 21:45:57.836236  9521 layer_factory.hpp:77] Creating layer cls_prob
+I0430 21:45:57.836247  9521 net.cpp:106] Creating Layer cls_prob
+I0430 21:45:57.836251  9521 net.cpp:454] cls_prob <- cls_score
+I0430 21:45:57.836256  9521 net.cpp:411] cls_prob -> cls_prob
+I0430 21:45:57.836314  9521 net.cpp:150] Setting up cls_prob
+I0430 21:45:57.836320  9521 net.cpp:157] Top shape: 1 2 (2)
+I0430 21:45:57.836323  9521 net.cpp:165] Memory required for data: 22003060
+I0430 21:45:57.836328  9521 net.cpp:228] cls_prob does not need backward computation.
+I0430 21:45:57.836336  9521 net.cpp:228] bbox_pred does not need backward computation.
+I0430 21:45:57.836338  9521 net.cpp:228] cls_score does not need backward computation.
+I0430 21:45:57.836344  9521 net.cpp:228] fc7_drop7_0_split does not need backward computation.
+I0430 21:45:57.836349  9521 net.cpp:228] drop7 does not need backward computation.
+I0430 21:45:57.836352  9521 net.cpp:228] relu7 does not need backward computation.
+I0430 21:45:57.836355  9521 net.cpp:228] fc7 does not need backward computation.
+I0430 21:45:57.836359  9521 net.cpp:228] drop6 does not need backward computation.
+I0430 21:45:57.836362  9521 net.cpp:228] relu6 does not need backward computation.
+I0430 21:45:57.836366  9521 net.cpp:228] fc6 does not need backward computation.
+I0430 21:45:57.836369  9521 net.cpp:228] roi_pool_conv5 does not need backward computation.
+I0430 21:45:57.836375  9521 net.cpp:228] proposal does not need backward computation.
+I0430 21:45:57.836381  9521 net.cpp:228] rpn_cls_prob_reshape does not need backward computation.
+I0430 21:45:57.836386  9521 net.cpp:228] rpn_cls_prob does not need backward computation.
+I0430 21:45:57.836390  9521 net.cpp:228] rpn_cls_score_reshape does not need backward computation.
+I0430 21:45:57.836395  9521 net.cpp:228] rpn_bbox_pred does not need backward computation.
+I0430 21:45:57.836398  9521 net.cpp:228] rpn_cls_score does not need backward computation.
+I0430 21:45:57.836403  9521 net.cpp:228] rpn/output_rpn_relu/3x3_0_split does not need backward computation.
+I0430 21:45:57.836407  9521 net.cpp:228] rpn_relu/3x3 does not need backward computation.
+I0430 21:45:57.836411  9521 net.cpp:228] rpn_conv/3x3 does not need backward computation.
+I0430 21:45:57.836416  9521 net.cpp:228] conv5_relu5_0_split does not need backward computation.
+I0430 21:45:57.836419  9521 net.cpp:228] relu5 does not need backward computation.
+I0430 21:45:57.836423  9521 net.cpp:228] conv5 does not need backward computation.
+I0430 21:45:57.836427  9521 net.cpp:228] relu4 does not need backward computation.
+I0430 21:45:57.836431  9521 net.cpp:228] conv4 does not need backward computation.
+I0430 21:45:57.836434  9521 net.cpp:228] relu3 does not need backward computation.
+I0430 21:45:57.836437  9521 net.cpp:228] conv3 does not need backward computation.
+I0430 21:45:57.836442  9521 net.cpp:228] pool2 does not need backward computation.
+I0430 21:45:57.836446  9521 net.cpp:228] norm2 does not need backward computation.
+I0430 21:45:57.836450  9521 net.cpp:228] relu2 does not need backward computation.
+I0430 21:45:57.836453  9521 net.cpp:228] conv2 does not need backward computation.
+I0430 21:45:57.836457  9521 net.cpp:228] pool1 does not need backward computation.
+I0430 21:45:57.836460  9521 net.cpp:228] norm1 does not need backward computation.
+I0430 21:45:57.836465  9521 net.cpp:228] relu1 does not need backward computation.
+I0430 21:45:57.836467  9521 net.cpp:228] conv1 does not need backward computation.
+I0430 21:45:57.836470  9521 net.cpp:270] This network produces output bbox_pred
+I0430 21:45:57.836474  9521 net.cpp:270] This network produces output cls_prob
+I0430 21:45:57.836503  9521 net.cpp:283] Network initialization done.
+I0430 21:45:58.670729  9521 net.cpp:816] Ignoring source layer input-data
+I0430 21:45:58.670764  9521 net.cpp:816] Ignoring source layer data_input-data_0_split
+I0430 21:45:58.670769  9521 net.cpp:816] Ignoring source layer im_info_input-data_1_split
+I0430 21:45:58.670773  9521 net.cpp:816] Ignoring source layer gt_boxes_input-data_2_split
+I0430 21:45:58.680169  9521 net.cpp:816] Ignoring source layer rpn_cls_score_rpn_cls_score_0_split
+I0430 21:45:58.680238  9521 net.cpp:816] Ignoring source layer rpn_bbox_pred_rpn_bbox_pred_0_split
+I0430 21:45:58.680243  9521 net.cpp:816] Ignoring source layer rpn_cls_score_reshape_rpn_cls_score_reshape_0_split
+I0430 21:45:58.680248  9521 net.cpp:816] Ignoring source layer rpn-data
+I0430 21:45:58.680251  9521 net.cpp:816] Ignoring source layer rpn_loss_cls
+I0430 21:45:58.680255  9521 net.cpp:816] Ignoring source layer rpn_loss_bbox
+I0430 21:45:58.680268  9521 net.cpp:816] Ignoring source layer roi-data
+I0430 21:45:58.787820  9521 net.cpp:816] Ignoring source layer loss_cls
+I0430 21:45:58.787837  9521 net.cpp:816] Ignoring source layer loss_bbox
+NET
+<caffe._caffe.Net object at 0x2aaada1a9e10>
+im_detect: 1/563 0.180s 0.000s
+im_detect: 2/563 0.157s 0.000s
+im_detect: 3/563 0.156s 0.000s
+im_detect: 4/563 0.151s 0.000s
+im_detect: 5/563 0.149s 0.000s
+im_detect: 6/563 0.154s 0.000s
+im_detect: 7/563 0.152s 0.000s
+im_detect: 8/563 0.151s 0.000s
+im_detect: 9/563 0.153s 0.000s
+im_detect: 10/563 0.152s 0.000s
+im_detect: 11/563 0.152s 0.000s
+im_detect: 12/563 0.151s 0.000s
+im_detect: 13/563 0.153s 0.000s
+im_detect: 14/563 0.153s 0.000s
+im_detect: 15/563 0.154s 0.000s
+im_detect: 16/563 0.153s 0.000s
+im_detect: 17/563 0.155s 0.000s
+im_detect: 18/563 0.154s 0.000s
+im_detect: 19/563 0.155s 0.000s
+im_detect: 20/563 0.155s 0.000s
+im_detect: 21/563 0.154s 0.000s
+im_detect: 22/563 0.153s 0.000s
+im_detect: 23/563 0.152s 0.000s
+im_detect: 24/563 0.152s 0.000s
+im_detect: 25/563 0.151s 0.000s
+im_detect: 26/563 0.150s 0.000s
+im_detect: 27/563 0.149s 0.000s
+im_detect: 28/563 0.148s 0.000s
+im_detect: 29/563 0.147s 0.000s
+im_detect: 30/563 0.147s 0.000s
+im_detect: 31/563 0.147s 0.000s
+im_detect: 32/563 0.145s 0.000s
+im_detect: 33/563 0.147s 0.000s
+im_detect: 34/563 0.147s 0.000s
+im_detect: 35/563 0.146s 0.000s
+im_detect: 36/563 0.145s 0.000s
+im_detect: 37/563 0.145s 0.000s
+im_detect: 38/563 0.144s 0.000s
+im_detect: 39/563 0.144s 0.000s
+im_detect: 40/563 0.143s 0.000s
+im_detect: 41/563 0.142s 0.000s
+im_detect: 42/563 0.142s 0.000s
+im_detect: 43/563 0.141s 0.000s
+im_detect: 44/563 0.141s 0.000s
+im_detect: 45/563 0.140s 0.000s
+im_detect: 46/563 0.139s 0.000s
+im_detect: 47/563 0.139s 0.000s
+im_detect: 48/563 0.140s 0.000s
+im_detect: 49/563 0.140s 0.000s
+im_detect: 50/563 0.141s 0.000s
+im_detect: 51/563 0.141s 0.000s
+im_detect: 52/563 0.141s 0.000s
+im_detect: 53/563 0.140s 0.000s
+im_detect: 54/563 0.140s 0.000s
+im_detect: 55/563 0.140s 0.000s
+im_detect: 56/563 0.140s 0.000s
+im_detect: 57/563 0.140s 0.000s
+im_detect: 58/563 0.140s 0.000s
+im_detect: 59/563 0.140s 0.000s
+im_detect: 60/563 0.140s 0.000s
+im_detect: 61/563 0.140s 0.000s
+im_detect: 62/563 0.140s 0.000s
+im_detect: 63/563 0.140s 0.000s
+im_detect: 64/563 0.140s 0.000s
+im_detect: 65/563 0.141s 0.000s
+im_detect: 66/563 0.142s 0.000s
+im_detect: 67/563 0.141s 0.000s
+im_detect: 68/563 0.141s 0.000s
+im_detect: 69/563 0.141s 0.000s
+im_detect: 70/563 0.140s 0.000s
+im_detect: 71/563 0.140s 0.000s
+im_detect: 72/563 0.140s 0.000s
+im_detect: 73/563 0.139s 0.000s
+im_detect: 74/563 0.139s 0.000s
+im_detect: 75/563 0.139s 0.000s
+im_detect: 76/563 0.139s 0.000s
+im_detect: 77/563 0.138s 0.000s
+im_detect: 78/563 0.138s 0.000s
+im_detect: 79/563 0.138s 0.000s
+im_detect: 80/563 0.137s 0.000s
+im_detect: 81/563 0.138s 0.000s
+im_detect: 82/563 0.138s 0.000s
+im_detect: 83/563 0.138s 0.000s
+im_detect: 84/563 0.138s 0.000s
+im_detect: 85/563 0.138s 0.000s
+im_detect: 86/563 0.137s 0.000s
+im_detect: 87/563 0.137s 0.000s
+im_detect: 88/563 0.137s 0.000s
+im_detect: 89/563 0.136s 0.000s
+im_detect: 90/563 0.136s 0.000s
+im_detect: 91/563 0.136s 0.000s
+im_detect: 92/563 0.137s 0.000s
+im_detect: 93/563 0.137s 0.000s
+im_detect: 94/563 0.137s 0.000s
+im_detect: 95/563 0.137s 0.000s
+im_detect: 96/563 0.137s 0.000s
+im_detect: 97/563 0.137s 0.000s
+im_detect: 98/563 0.137s 0.000s
+im_detect: 99/563 0.137s 0.000s
+im_detect: 100/563 0.137s 0.000s
+im_detect: 101/563 0.137s 0.000s
+im_detect: 102/563 0.137s 0.000s
+im_detect: 103/563 0.136s 0.000s
+im_detect: 104/563 0.136s 0.000s
+im_detect: 105/563 0.136s 0.000s
+im_detect: 106/563 0.136s 0.000s
+im_detect: 107/563 0.136s 0.000s
+im_detect: 108/563 0.136s 0.000s
+im_detect: 109/563 0.136s 0.000s
+im_detect: 110/563 0.136s 0.000s
+im_detect: 111/563 0.136s 0.000s
+im_detect: 112/563 0.136s 0.000s
+im_detect: 113/563 0.136s 0.000s
+im_detect: 114/563 0.136s 0.000s
+im_detect: 115/563 0.136s 0.000s
+im_detect: 116/563 0.136s 0.000s
+im_detect: 117/563 0.136s 0.000s
+im_detect: 118/563 0.136s 0.000s
+im_detect: 119/563 0.136s 0.000s
+im_detect: 120/563 0.135s 0.000s
+im_detect: 121/563 0.135s 0.000s
+im_detect: 122/563 0.135s 0.000s
+im_detect: 123/563 0.135s 0.000s
+im_detect: 124/563 0.135s 0.000s
+im_detect: 125/563 0.135s 0.000s
+im_detect: 126/563 0.135s 0.000s
+im_detect: 127/563 0.135s 0.000s
+im_detect: 128/563 0.135s 0.000s
+im_detect: 129/563 0.135s 0.000s
+im_detect: 130/563 0.135s 0.000s
+im_detect: 131/563 0.135s 0.000s
+im_detect: 132/563 0.135s 0.000s
+im_detect: 133/563 0.135s 0.000s
+im_detect: 134/563 0.135s 0.000s
+im_detect: 135/563 0.135s 0.000s
+im_detect: 136/563 0.135s 0.000s
+im_detect: 137/563 0.135s 0.000s
+im_detect: 138/563 0.135s 0.000s
+im_detect: 139/563 0.135s 0.000s
+im_detect: 140/563 0.135s 0.000s
+im_detect: 141/563 0.134s 0.000s
+im_detect: 142/563 0.134s 0.000s
+im_detect: 143/563 0.134s 0.000s
+im_detect: 144/563 0.134s 0.000s
+im_detect: 145/563 0.134s 0.000s
+im_detect: 146/563 0.134s 0.000s
+im_detect: 147/563 0.134s 0.000s
+im_detect: 148/563 0.134s 0.000s
+im_detect: 149/563 0.134s 0.000s
+im_detect: 150/563 0.134s 0.000s
+im_detect: 151/563 0.134s 0.000s
+im_detect: 152/563 0.133s 0.000s
+im_detect: 153/563 0.133s 0.000s
+im_detect: 154/563 0.133s 0.000s
+im_detect: 155/563 0.133s 0.000s
+im_detect: 156/563 0.132s 0.000s
+im_detect: 157/563 0.132s 0.000s
+im_detect: 158/563 0.132s 0.000s
+im_detect: 159/563 0.132s 0.000s
+im_detect: 160/563 0.132s 0.000s
+im_detect: 161/563 0.131s 0.000s
+im_detect: 162/563 0.131s 0.000s
+im_detect: 163/563 0.131s 0.000s
+im_detect: 164/563 0.132s 0.000s
+im_detect: 165/563 0.132s 0.000s
+im_detect: 166/563 0.132s 0.000s
+im_detect: 167/563 0.132s 0.000s
+im_detect: 168/563 0.132s 0.000s
+im_detect: 169/563 0.132s 0.000s
+im_detect: 170/563 0.132s 0.000s
+im_detect: 171/563 0.132s 0.000s
+im_detect: 172/563 0.131s 0.000s
+im_detect: 173/563 0.132s 0.000s
+im_detect: 174/563 0.132s 0.000s
+im_detect: 175/563 0.132s 0.000s
+im_detect: 176/563 0.131s 0.000s
+im_detect: 177/563 0.131s 0.000s
+im_detect: 178/563 0.131s 0.000s
+im_detect: 179/563 0.131s 0.000s
+im_detect: 180/563 0.131s 0.000s
+im_detect: 181/563 0.131s 0.000s
+im_detect: 182/563 0.131s 0.000s
+im_detect: 183/563 0.132s 0.000s
+im_detect: 184/563 0.132s 0.000s
+im_detect: 185/563 0.132s 0.000s
+im_detect: 186/563 0.132s 0.000s
+im_detect: 187/563 0.132s 0.000s
+im_detect: 188/563 0.131s 0.000s
+im_detect: 189/563 0.131s 0.000s
+im_detect: 190/563 0.131s 0.000s
+im_detect: 191/563 0.131s 0.000s
+im_detect: 192/563 0.131s 0.000s
+im_detect: 193/563 0.131s 0.000s
+im_detect: 194/563 0.131s 0.000s
+im_detect: 195/563 0.131s 0.000s
+im_detect: 196/563 0.131s 0.000s
+im_detect: 197/563 0.131s 0.000s
+im_detect: 198/563 0.131s 0.000s
+im_detect: 199/563 0.131s 0.000s
+im_detect: 200/563 0.131s 0.000s
+im_detect: 201/563 0.131s 0.000s
+im_detect: 202/563 0.131s 0.000s
+im_detect: 203/563 0.131s 0.000s
+im_detect: 204/563 0.131s 0.000s
+im_detect: 205/563 0.131s 0.000s
+im_detect: 206/563 0.131s 0.000s
+im_detect: 207/563 0.131s 0.000s
+im_detect: 208/563 0.131s 0.000s
+im_detect: 209/563 0.131s 0.000s
+im_detect: 210/563 0.131s 0.000s
+im_detect: 211/563 0.130s 0.000s
+im_detect: 212/563 0.130s 0.000s
+im_detect: 213/563 0.130s 0.000s
+im_detect: 214/563 0.130s 0.000s
+im_detect: 215/563 0.130s 0.000s
+im_detect: 216/563 0.130s 0.000s
+im_detect: 217/563 0.130s 0.000s
+im_detect: 218/563 0.130s 0.000s
+im_detect: 219/563 0.130s 0.000s
+im_detect: 220/563 0.130s 0.000s
+im_detect: 221/563 0.130s 0.000s
+im_detect: 222/563 0.130s 0.000s
+im_detect: 223/563 0.130s 0.000s
+im_detect: 224/563 0.130s 0.000s
+im_detect: 225/563 0.130s 0.000s
+im_detect: 226/563 0.130s 0.000s
+im_detect: 227/563 0.130s 0.000s
+im_detect: 228/563 0.130s 0.000s
+im_detect: 229/563 0.130s 0.000s
+im_detect: 230/563 0.130s 0.000s
+im_detect: 231/563 0.130s 0.000s
+im_detect: 232/563 0.130s 0.000s
+im_detect: 233/563 0.130s 0.000s
+im_detect: 234/563 0.130s 0.000s
+im_detect: 235/563 0.130s 0.000s
+im_detect: 236/563 0.129s 0.000s
+im_detect: 237/563 0.130s 0.000s
+im_detect: 238/563 0.130s 0.000s
+im_detect: 239/563 0.130s 0.000s
+im_detect: 240/563 0.129s 0.000s
+im_detect: 241/563 0.129s 0.000s
+im_detect: 242/563 0.129s 0.000s
+im_detect: 243/563 0.129s 0.000s
+im_detect: 244/563 0.129s 0.000s
+im_detect: 245/563 0.129s 0.000s
+im_detect: 246/563 0.129s 0.000s
+im_detect: 247/563 0.129s 0.000s
+im_detect: 248/563 0.129s 0.000s
+im_detect: 249/563 0.129s 0.000s
+im_detect: 250/563 0.129s 0.000s
+im_detect: 251/563 0.129s 0.000s
+im_detect: 252/563 0.129s 0.000s
+im_detect: 253/563 0.129s 0.000s
+im_detect: 254/563 0.129s 0.000s
+im_detect: 255/563 0.129s 0.000s
+im_detect: 256/563 0.129s 0.000s
+im_detect: 257/563 0.129s 0.000s
+im_detect: 258/563 0.129s 0.000s
+im_detect: 259/563 0.128s 0.000s
+im_detect: 260/563 0.128s 0.000s
+im_detect: 261/563 0.128s 0.000s
+im_detect: 262/563 0.128s 0.000s
+im_detect: 263/563 0.128s 0.000s
+im_detect: 264/563 0.128s 0.000s
+im_detect: 265/563 0.128s 0.000s
+im_detect: 266/563 0.128s 0.000s
+im_detect: 267/563 0.128s 0.000s
+im_detect: 268/563 0.128s 0.000s
+im_detect: 269/563 0.128s 0.000s
+im_detect: 270/563 0.128s 0.000s
+im_detect: 271/563 0.128s 0.000s
+im_detect: 272/563 0.128s 0.000s
+im_detect: 273/563 0.128s 0.000s
+im_detect: 274/563 0.128s 0.000s
+im_detect: 275/563 0.128s 0.000s
+im_detect: 276/563 0.128s 0.000s
+im_detect: 277/563 0.128s 0.000s
+im_detect: 278/563 0.128s 0.000s
+im_detect: 279/563 0.128s 0.000s
+im_detect: 280/563 0.128s 0.000s
+im_detect: 281/563 0.128s 0.000s
+im_detect: 282/563 0.128s 0.000s
+im_detect: 283/563 0.127s 0.000s
+im_detect: 284/563 0.127s 0.000s
+im_detect: 285/563 0.127s 0.000s
+im_detect: 286/563 0.128s 0.000s
+im_detect: 287/563 0.128s 0.000s
+im_detect: 288/563 0.128s 0.000s
+im_detect: 289/563 0.128s 0.000s
+im_detect: 290/563 0.128s 0.000s
+im_detect: 291/563 0.128s 0.000s
+im_detect: 292/563 0.128s 0.000s
+im_detect: 293/563 0.128s 0.000s
+im_detect: 294/563 0.128s 0.000s
+im_detect: 295/563 0.127s 0.000s
+im_detect: 296/563 0.127s 0.000s
+im_detect: 297/563 0.127s 0.000s
+im_detect: 298/563 0.128s 0.000s
+im_detect: 299/563 0.128s 0.000s
+im_detect: 300/563 0.128s 0.000s
+im_detect: 301/563 0.128s 0.000s
+im_detect: 302/563 0.128s 0.000s
+im_detect: 303/563 0.128s 0.000s
+im_detect: 304/563 0.128s 0.000s
+im_detect: 305/563 0.127s 0.000s
+im_detect: 306/563 0.127s 0.000s
+im_detect: 307/563 0.127s 0.000s
+im_detect: 308/563 0.127s 0.000s
+im_detect: 309/563 0.127s 0.000s
+im_detect: 310/563 0.127s 0.000s
+im_detect: 311/563 0.127s 0.000s
+im_detect: 312/563 0.127s 0.000s
+im_detect: 313/563 0.127s 0.000s
+im_detect: 314/563 0.127s 0.000s
+im_detect: 315/563 0.127s 0.000s
+im_detect: 316/563 0.127s 0.000s
+im_detect: 317/563 0.127s 0.000s
+im_detect: 318/563 0.127s 0.000s
+im_detect: 319/563 0.127s 0.000s
+im_detect: 320/563 0.127s 0.000s
+im_detect: 321/563 0.127s 0.000s
+im_detect: 322/563 0.127s 0.000s
+im_detect: 323/563 0.127s 0.000s
+im_detect: 324/563 0.127s 0.000s
+im_detect: 325/563 0.127s 0.000s
+im_detect: 326/563 0.127s 0.000s
+im_detect: 327/563 0.127s 0.000s
+im_detect: 328/563 0.127s 0.000s
+im_detect: 329/563 0.127s 0.000s
+im_detect: 330/563 0.127s 0.000s
+im_detect: 331/563 0.127s 0.000s
+im_detect: 332/563 0.127s 0.000s
+im_detect: 333/563 0.127s 0.000s
+im_detect: 334/563 0.127s 0.000s
+im_detect: 335/563 0.127s 0.000s
+im_detect: 336/563 0.127s 0.000s
+im_detect: 337/563 0.127s 0.000s
+im_detect: 338/563 0.127s 0.000s
+im_detect: 339/563 0.127s 0.000s
+im_detect: 340/563 0.127s 0.000s
+im_detect: 341/563 0.127s 0.000s
+im_detect: 342/563 0.127s 0.000s
+im_detect: 343/563 0.127s 0.000s
+im_detect: 344/563 0.127s 0.000s
+im_detect: 345/563 0.127s 0.000s
+im_detect: 346/563 0.127s 0.000s
+im_detect: 347/563 0.127s 0.000s
+im_detect: 348/563 0.127s 0.000s
+im_detect: 349/563 0.127s 0.000s
+im_detect: 350/563 0.127s 0.000s
+im_detect: 351/563 0.127s 0.000s
+im_detect: 352/563 0.127s 0.000s
+im_detect: 353/563 0.127s 0.000s
+im_detect: 354/563 0.127s 0.000s
+im_detect: 355/563 0.127s 0.000s
+im_detect: 356/563 0.127s 0.000s
+im_detect: 357/563 0.127s 0.000s
+im_detect: 358/563 0.127s 0.000s
+im_detect: 359/563 0.127s 0.000s
+im_detect: 360/563 0.127s 0.000s
+im_detect: 361/563 0.127s 0.000s
+im_detect: 362/563 0.127s 0.000s
+im_detect: 363/563 0.127s 0.000s
+im_detect: 364/563 0.127s 0.000s
+im_detect: 365/563 0.127s 0.000s
+im_detect: 366/563 0.127s 0.000s
+im_detect: 367/563 0.127s 0.000s
+im_detect: 368/563 0.127s 0.000s
+im_detect: 369/563 0.127s 0.000s
+im_detect: 370/563 0.127s 0.000s
+im_detect: 371/563 0.127s 0.000s
+im_detect: 372/563 0.127s 0.000s
+im_detect: 373/563 0.127s 0.000s
+im_detect: 374/563 0.127s 0.000s
+im_detect: 375/563 0.127s 0.000s
+im_detect: 376/563 0.127s 0.000s
+im_detect: 377/563 0.127s 0.000s
+im_detect: 378/563 0.126s 0.000s
+im_detect: 379/563 0.126s 0.000s
+im_detect: 380/563 0.126s 0.000s
+im_detect: 381/563 0.126s 0.000s
+im_detect: 382/563 0.126s 0.000s
+im_detect: 383/563 0.126s 0.000s
+im_detect: 384/563 0.126s 0.000s
+im_detect: 385/563 0.126s 0.000s
+im_detect: 386/563 0.126s 0.000s
+im_detect: 387/563 0.126s 0.000s
+im_detect: 388/563 0.126s 0.000s
+im_detect: 389/563 0.126s 0.000s
+im_detect: 390/563 0.126s 0.000s
+im_detect: 391/563 0.126s 0.000s
+im_detect: 392/563 0.126s 0.000s
+im_detect: 393/563 0.126s 0.000s
+im_detect: 394/563 0.126s 0.000s
+im_detect: 395/563 0.126s 0.000s
+im_detect: 396/563 0.126s 0.000s
+im_detect: 397/563 0.126s 0.000s
+im_detect: 398/563 0.126s 0.000s
+im_detect: 399/563 0.126s 0.000s
+im_detect: 400/563 0.126s 0.000s
+im_detect: 401/563 0.126s 0.000s
+im_detect: 402/563 0.127s 0.000s
+im_detect: 403/563 0.127s 0.000s
+im_detect: 404/563 0.127s 0.000s
+im_detect: 405/563 0.127s 0.000s
+im_detect: 406/563 0.126s 0.000s
+im_detect: 407/563 0.127s 0.000s
+im_detect: 408/563 0.126s 0.000s
+im_detect: 409/563 0.126s 0.000s
+im_detect: 410/563 0.126s 0.000s
+im_detect: 411/563 0.126s 0.000s
+im_detect: 412/563 0.126s 0.000s
+im_detect: 413/563 0.126s 0.000s
+im_detect: 414/563 0.126s 0.000s
+im_detect: 415/563 0.126s 0.000s
+im_detect: 416/563 0.126s 0.000s
+im_detect: 417/563 0.126s 0.000s
+im_detect: 418/563 0.127s 0.000s
+im_detect: 419/563 0.127s 0.000s
+im_detect: 420/563 0.127s 0.000s
+im_detect: 421/563 0.127s 0.000s
+im_detect: 422/563 0.127s 0.000s
+im_detect: 423/563 0.127s 0.000s
+im_detect: 424/563 0.127s 0.000s
+im_detect: 425/563 0.127s 0.000s
+im_detect: 426/563 0.127s 0.000s
+im_detect: 427/563 0.127s 0.000s
+im_detect: 428/563 0.126s 0.000s
+im_detect: 429/563 0.126s 0.000s
+im_detect: 430/563 0.126s 0.000s
+im_detect: 431/563 0.126s 0.000s
+im_detect: 432/563 0.126s 0.000s
+im_detect: 433/563 0.126s 0.000s
+im_detect: 434/563 0.126s 0.000s
+im_detect: 435/563 0.126s 0.000s
+im_detect: 436/563 0.126s 0.000s
+im_detect: 437/563 0.126s 0.000s
+im_detect: 438/563 0.126s 0.000s
+im_detect: 439/563 0.126s 0.000s
+im_detect: 440/563 0.126s 0.000s
+im_detect: 441/563 0.126s 0.000s
+im_detect: 442/563 0.126s 0.000s
+im_detect: 443/563 0.126s 0.000s
+im_detect: 444/563 0.126s 0.000s
+im_detect: 445/563 0.126s 0.000s
+im_detect: 446/563 0.126s 0.000s
+im_detect: 447/563 0.126s 0.000s
+im_detect: 448/563 0.126s 0.000s
+im_detect: 449/563 0.126s 0.000s
+im_detect: 450/563 0.126s 0.000s
+im_detect: 451/563 0.126s 0.000s
+im_detect: 452/563 0.126s 0.000s
+im_detect: 453/563 0.126s 0.000s
+im_detect: 454/563 0.126s 0.000s
+im_detect: 455/563 0.126s 0.000s
+im_detect: 456/563 0.126s 0.000s
+im_detect: 457/563 0.126s 0.000s
+im_detect: 458/563 0.126s 0.000s
+im_detect: 459/563 0.126s 0.000s
+im_detect: 460/563 0.126s 0.000s
+im_detect: 461/563 0.126s 0.000s
+im_detect: 462/563 0.126s 0.000s
+im_detect: 463/563 0.126s 0.000s
+im_detect: 464/563 0.126s 0.000s
+im_detect: 465/563 0.126s 0.000s
+im_detect: 466/563 0.126s 0.000s
+im_detect: 467/563 0.126s 0.000s
+im_detect: 468/563 0.126s 0.000s
+im_detect: 469/563 0.126s 0.000s
+im_detect: 470/563 0.126s 0.000s
+im_detect: 471/563 0.126s 0.000s
+im_detect: 472/563 0.126s 0.000s
+im_detect: 473/563 0.126s 0.000s
+im_detect: 474/563 0.126s 0.000s
+im_detect: 475/563 0.126s 0.000s
+im_detect: 476/563 0.126s 0.000s
+im_detect: 477/563 0.126s 0.000s
+im_detect: 478/563 0.126s 0.000s
+im_detect: 479/563 0.126s 0.000s
+im_detect: 480/563 0.126s 0.000s
+im_detect: 481/563 0.126s 0.000s
+im_detect: 482/563 0.126s 0.000s
+im_detect: 483/563 0.126s 0.000s
+im_detect: 484/563 0.126s 0.000s
+im_detect: 485/563 0.126s 0.000s
+im_detect: 486/563 0.126s 0.000s
+im_detect: 487/563 0.126s 0.000s
+im_detect: 488/563 0.126s 0.000s
+im_detect: 489/563 0.126s 0.000s
+im_detect: 490/563 0.126s 0.000s
+im_detect: 491/563 0.126s 0.000s
+im_detect: 492/563 0.126s 0.000s
+im_detect: 493/563 0.126s 0.000s
+im_detect: 494/563 0.126s 0.000s
+im_detect: 495/563 0.126s 0.000s
+im_detect: 496/563 0.126s 0.000s
+im_detect: 497/563 0.126s 0.000s
+im_detect: 498/563 0.126s 0.000s
+im_detect: 499/563 0.126s 0.000s
+im_detect: 500/563 0.126s 0.000s
+im_detect: 501/563 0.126s 0.000s
+im_detect: 502/563 0.126s 0.000s
+im_detect: 503/563 0.126s 0.000s
+im_detect: 504/563 0.126s 0.000s
+im_detect: 505/563 0.126s 0.000s
+im_detect: 506/563 0.126s 0.000s
+im_detect: 507/563 0.126s 0.000s
+im_detect: 508/563 0.126s 0.000s
+im_detect: 509/563 0.126s 0.000s
+im_detect: 510/563 0.126s 0.000s
+im_detect: 511/563 0.126s 0.000s
+im_detect: 512/563 0.126s 0.000s
+im_detect: 513/563 0.126s 0.000s
+im_detect: 514/563 0.126s 0.000s
+im_detect: 515/563 0.126s 0.000s
+im_detect: 516/563 0.126s 0.000s
+im_detect: 517/563 0.127s 0.000s
+im_detect: 518/563 0.127s 0.000s
+im_detect: 519/563 0.127s 0.000s
+im_detect: 520/563 0.127s 0.000s
+im_detect: 521/563 0.127s 0.000s
+im_detect: 522/563 0.127s 0.000s
+im_detect: 523/563 0.127s 0.000s
+im_detect: 524/563 0.127s 0.000s
+im_detect: 525/563 0.127s 0.000s
+im_detect: 526/563 0.127s 0.000s
+im_detect: 527/563 0.127s 0.000s
+im_detect: 528/563 0.127s 0.000s
+im_detect: 529/563 0.127s 0.000s
+im_detect: 530/563 0.127s 0.000s
+im_detect: 531/563 0.127s 0.000s
+im_detect: 532/563 0.127s 0.000s
+im_detect: 533/563 0.127s 0.000s
+im_detect: 534/563 0.127s 0.000s
+im_detect: 535/563 0.127s 0.000s
+im_detect: 536/563 0.127s 0.000s
+im_detect: 537/563 0.127s 0.000s
+im_detect: 538/563 0.127s 0.000s
+im_detect: 539/563 0.127s 0.000s
+im_detect: 540/563 0.127s 0.000s
+im_detect: 541/563 0.127s 0.000s
+im_detect: 542/563 0.127s 0.000s
+im_detect: 543/563 0.127s 0.000s
+im_detect: 544/563 0.127s 0.000s
+im_detect: 545/563 0.127s 0.000s
+im_detect: 546/563 0.127s 0.000s
+im_detect: 547/563 0.127s 0.000s
+im_detect: 548/563 0.127s 0.000s
+im_detect: 549/563 0.127s 0.000s
+im_detect: 550/563 0.127s 0.000s
+im_detect: 551/563 0.127s 0.000s
+im_detect: 552/563 0.127s 0.000s
+im_detect: 553/563 0.127s 0.000s
+im_detect: 554/563 0.127s 0.000s
+im_detect: 555/563 0.127s 0.000s
+im_detect: 556/563 0.127s 0.000s
+im_detect: 557/563 0.127s 0.000s
+im_detect: 558/563 0.127s 0.000s
+im_detect: 559/563 0.127s 0.000s
+im_detect: 560/563 0.127s 0.000s
+im_detect: 561/563 0.127s 0.000s
+im_detect: 562/563 0.127s 0.000s
+im_detect: 563/563 0.127s 0.000s
+Evaluating detections
+Writing roost VOC results file
+VOC07 metric? Yes
+/home/sgabriel/py-faster-rcnn/data/VOCdevkit2007/annotations_cache
+158
+eval
+0.00912863070539
+0.0696202531646
+0.00810441724881
+0.198968201182
+AP for roost = 0.0909
+Mean Precision for roost = 0.1990
+Mean Recall for roost = 0.0081
+Mean AP = 0.0909
+~~~~~~~~
+Results:
+0.091
+0.091
+~~~~~~~~
+
+--------------------------------------------------------------
+Results computed with the **unofficial** Python eval code.
+Results should be very close to the official MATLAB eval code.
+Recompute with `./tools/reval.py --matlab ...` for your paper.
+-- Thanks, The Management
+--------------------------------------------------------------
+
+real	1m23.363s
+user	2m40.440s
+sys	0m4.360s
