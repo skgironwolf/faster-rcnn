@@ -35,7 +35,7 @@ for i=1:numel(scanIDs)
      channel2 = sweep2cart(sweep2, rmax, dim);
      channel3 = sweep2cart(sweep3, rmax, dim);
 
-     %scale values to between 0 and 1 
+     %scale values 
      channel1 = (channel1 - min)./(max-min);
      channel1(isnan(channel1)) = 0;
      channel2 = (channel2 - min)./(max-min);
