@@ -98,12 +98,12 @@ radar = rsl2mat(fileName, roo.station);
 rmax = 150000;
 dim = 600;
 sweep = radar.dz.sweeps(1);
-[Z,x,y] = sweep2cart(sweep,rmax,dim);
+[Z,X,Y] = sweep2cart(sweep,rmax,dim);
 
-x0 = min(x);
-y0 = min(y);
-dx = mean(abs(diff(x)));   % meters per pixel
-dy = mean(abs(diff(y)));   % meters per pixel
+x0 = min(X);
+y0 = min(Y);
+dx = mean(abs(diff(X)));   % meters per pixel
+dy = mean(abs(diff(Y)));   % meters per pixel
 
 roost_i = round((roo.x - x0)/dx) + 1; 
 roost_j = round((max(y)-roo.y)/dy) + 1; 
@@ -112,7 +112,7 @@ minX = (roost_i-round(1.5*roost_r));
 minY = (roost_j-round(1.5*roost_r));
 box_d = 3*roost_r;
 
-save(strcat('bbox',int2str(i),'.mat'),'x','y','radar');
+%save(strcat('bbox',int2str(i),'.mat'),'X','Y','radar');
 
 bndbox = docNode.createElement('bndbox');
 
