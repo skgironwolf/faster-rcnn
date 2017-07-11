@@ -9,6 +9,8 @@ nRoosts = numel(roosts); % number of roosts
 scanIDs = unique([roosts.scan_id]); % number of unique radar scans 
 min = -5;
 max = 35;
+minVR = -20;
+maxVR = 20;
 
 for i=1:numel(scanIDs)
      get_roosts = roosts([roosts.scan_id] == scanIDs(i));
@@ -40,7 +42,7 @@ for i=1:numel(scanIDs)
      channel1(isnan(channel1)) = 0;
      channel2 = (channel2 - min)./(max-min);
      channel2(isnan(channel2)) = 0;
-     channel3 = (channel3 - min)./(max-min);
+     channel3 = (channel3 - minVR)./(maxVR-minVR);
      channel3(isnan(channel3)) = 0;
 
      %render and save image
